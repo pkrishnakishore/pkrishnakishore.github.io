@@ -1,40 +1,158 @@
-<!-- projects.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projects - Krishna Kishore Pandalaneni</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header>
-    <h1>My Projects</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-    </nav>
-  </header>
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #343a40;
+}
 
-  <main>
-    <section>
-      <h2>UN System-Wide Evaluation Office</h2>
-      <p>Coordinated evidence synthesis and AI-policy alignment across global programs.</p>
-    </section>
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px 40px;
+    background-color: #ffffff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    border-radius: 8px;
+}
 
-    <section>
-      <h2>ESIC: Evidence Synthesis Infrastructure Collaborative</h2>
-      <p>Consultant for Working Groups on AI governance and data sharing strategies.</p>
-    </section>
+/* Links */
+a {
+    color: #0056b3;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
 
-    <section>
-      <h2>UNDP Evaluation Projects</h2>
-      <p>Led machine learning-backed synthesis of evaluation findings to inform programming decisions across multiple sectors.</p>
-    </section>
-  </main>
+a:hover {
+    color: #003d80;
+    text-decoration: underline;
+}
 
-  <footer>
-    <p>&copy; 2025 Krishna Kishore Pandalaneni</p>
-  </footer>
-</body>
-</html>
+/* Header */
+header {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 5px 0;
+    font-size: 2.5em;
+    color: #212529;
+}
+
+header .subtitle {
+    margin: 0 0 15px 0;
+    font-size: 1.2em;
+    color: #6c757d;
+}
+
+.contact-info span {
+    margin: 0 10px;
+    color: #495057;
+    font-size: 0.95em;
+}
+
+.contact-info span a {
+    color: #0056b3; /* Ensure links are blue */
+}
+
+.page-header { /* Specific style for headers on secondary pages */
+   text-align: left;
+   border-bottom: 1px solid #eee;
+}
+
+.page-header a {
+    font-weight: bold;
+}
+
+
+/* Sections */
+section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+h2 {
+    color: #0056b3;
+    margin-bottom: 15px;
+    font-size: 1.6em;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 5px;
+}
+
+h3 {
+    color: #343a40;
+    margin-bottom: 8px;
+    font-size: 1.2em;
+}
+
+p {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+ul {
+    list-style: disc;
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+li {
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+/* Experience Specific */
+#experience-summary .job-summary p {
+    margin: 5px 0;
+}
+#experience-summary .job-summary strong {
+    color: #343a40;
+}
+
+#experience-detailed .job, .education-item {
+    margin-bottom: 25px;
+}
+
+.job span, .education-item span { /* Dates */
+    font-style: italic;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.job ul {
+    margin-top: 10px;
+}
+
+/* Skills */
+#skills ul {
+    list-style: none;
+    padding-left: 0;
+}
+#skills li strong {
+    display: inline-block;
+    width: 150px; /* Adjust as needed */
+    font-weight: bold;
+    color: #343a40;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+    font-size: 0.9em;
+    color: #6c757d;
+}
