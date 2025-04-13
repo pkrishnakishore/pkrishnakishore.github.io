@@ -1,0 +1,40 @@
+<!-- projects.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects - Krishna Kishore Pandalaneni</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>My Projects</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="projects.html">Projects</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>UN System-Wide Evaluation Office</h2>
+      <p>Coordinated evidence synthesis and AI-policy alignment across global programs.</p>
+    </section>
+
+    <section>
+      <h2>ESIC: Evidence Synthesis Infrastructure Collaborative</h2>
+      <p>Consultant for Working Groups on AI governance and data sharing strategies.</p>
+    </section>
+
+    <section>
+      <h2>UNDP Evaluation Projects</h2>
+      <p>Led machine learning-backed synthesis of evaluation findings to inform programming decisions across multiple sectors.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Krishna Kishore Pandalaneni</p>
+  </footer>
+</body>
+</html>
