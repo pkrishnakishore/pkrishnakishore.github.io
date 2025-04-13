@@ -1,158 +1,234 @@
-/* General Styles */
+/* --- Base and Variables --- */
+:root {
+    --primary-color: #005f73; /* Deep teal */
+    --secondary-color: #0a9396; /* Lighter teal */
+    --accent-color: #ee9b00; /* Amber/Gold */
+    --light-bg: #f8f9fa;
+    --dark-text: #343a40;
+    --light-text: #f8f9fa;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
+    font-family: 'Lato', sans-serif; /* Google Font */
+    line-height: 1.7;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    color: #343a40;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    font-size: 16px;
 }
 
-.container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px 40px;
-    background-color: #ffffff;
-    box-shadow: 0 0 15px rgba(0,0,0,0.05);
-    border-radius: 8px;
+/* --- Typography --- */
+h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif; /* Google Font for headings */
+    color: var(--primary-color);
+    margin-bottom: 1rem;
 }
 
-/* Links */
+h1 { font-size: 2.8rem; }
+h2 { font-size: 2rem; border-bottom: 3px solid var(--secondary-color); padding-bottom: 0.5rem; }
+h3 { font-size: 1.5rem; color: var(--secondary-color); }
+
 a {
-    color: #0056b3;
+    color: var(--secondary-color);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #003d80;
+    color: var(--accent-color);
     text-decoration: underline;
 }
 
-/* Header */
+/* --- Header & Navigation --- */
 header {
-    border-bottom: 2px solid #dee2e6;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    background: linear-gradient(rgba(0, 95, 115, 0.8), rgba(0, 95, 115, 0.8)), url('your-background-image.jpg') center/cover no-repeat; /* Add a background image URL */
+    color: var(--light-text);
+    padding: 2rem 1rem;
     text-align: center;
+    box-shadow: var(--shadow);
 }
 
 header h1 {
-    margin: 0 0 5px 0;
-    font-size: 2.5em;
-    color: #212529;
+    color: var(--light-text);
+    margin: 0;
+}
+header h1 i { margin-right: 10px; }
+
+header p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
 }
 
-header .subtitle {
-    margin: 0 0 15px 0;
-    font-size: 1.2em;
-    color: #6c757d;
-}
-
-.contact-info span {
-    margin: 0 10px;
-    color: #495057;
-    font-size: 0.95em;
-}
-
-.contact-info span a {
-    color: #0056b3; /* Ensure links are blue */
-}
-
-.page-header { /* Specific style for headers on secondary pages */
-   text-align: left;
-   border-bottom: 1px solid #eee;
-}
-
-.page-header a {
-    font-weight: bold;
-}
-
-
-/* Sections */
-section {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e9ecef;
-}
-
-section:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-h2 {
-    color: #0056b3;
-    margin-bottom: 15px;
-    font-size: 1.6em;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 5px;
-}
-
-h3 {
-    color: #343a40;
-    margin-bottom: 8px;
-    font-size: 1.2em;
-}
-
-p {
-    margin-bottom: 10px;
-    color: #495057;
-}
-
-ul {
-    list-style: disc;
-    margin-left: 20px;
-    padding-left: 0;
-}
-
-li {
-    margin-bottom: 8px;
-    color: #495057;
-}
-
-/* Experience Specific */
-#experience-summary .job-summary p {
-    margin: 5px 0;
-}
-#experience-summary .job-summary strong {
-    color: #343a40;
-}
-
-#experience-detailed .job, .education-item {
-    margin-bottom: 25px;
-}
-
-.job span, .education-item span { /* Dates */
-    font-style: italic;
-    color: #6c757d;
-    display: block;
-    margin-bottom: 10px;
-    font-size: 0.9em;
-}
-
-.job ul {
-    margin-top: 10px;
-}
-
-/* Skills */
-#skills ul {
+nav ul {
     list-style: none;
-    padding-left: 0;
-}
-#skills li strong {
-    display: inline-block;
-    width: 150px; /* Adjust as needed */
-    font-weight: bold;
-    color: #343a40;
+    padding: 0;
 }
 
-/* Footer */
+nav ul li {
+    display: inline-block; /* Use inline-block for better spacing control */
+    margin: 0 15px;
+}
+
+nav a {
+    color: var(--light-text);
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+nav a i { margin-right: 5px; }
+
+nav a:hover {
+    background-color: var(--accent-color);
+    color: var(--dark-text);
+    text-decoration: none;
+}
+
+/* --- Sections & Layout --- */
+.content-section, main section {
+    padding: 40px 20px;
+    margin: 30px auto;
+    background-color: var(--card-bg);
+    max-width: 1000px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease; /* For subtle hover effects */
+}
+
+.content-section:hover, main section:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+}
+
+section h2 i, main section h2 i { margin-right: 10px; color: var(--primary-color);}
+
+/* --- Cards --- */
+.card {
+    background-color: #fff; /* Ensure white background for cards */
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    border-left: 5px solid var(--secondary-color); /* Accent border */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+     box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+     transform: translateY(-3px);
+}
+
+.card h3 i { margin-right: 8px; color: var(--secondary-color); }
+.card p i { margin-right: 5px; color: var(--primary-color); opacity: 0.8; }
+.card ul { list-style: none; padding-left: 0; }
+.card ul li { margin-bottom: 8px; }
+.card ul li i { margin-right: 8px; color: var(--secondary-color); } /* Check icons */
+
+
+/* --- Specific Section Styling --- */
+#skills .skills-container {
+    display: grid; /* Use grid for layout */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns */
+    gap: 25px; /* Space between columns/rows */
+    margin-top: 20px;
+}
+
+#skills .skill-group {
+    /* background-color: #f8f9fa; */ /* Slight background for groups */
+    /* padding: 15px; */
+    /* border-radius: 5px; */
+}
+
+#skills .skill-group h3 { font-size: 1.2rem; margin-bottom: 10px; }
+#skills .skill-group h3 i { margin-right: 8px; }
+#skills ul { list-style: none; padding-left: 0; margin-top: 10px;}
+#skills li { margin-bottom: 8px; }
+
+.skill-category { cursor: pointer; font-weight: bold; }
+.skill-category i { margin-right: 5px; transition: transform 0.3s ease; } /* Rotate arrow icon */
+.skill-list { margin-left: 10px; font-style: normal; font-size: 0.95em; display: inline-block; padding-left: 5px; }
+
+/* Style for opened toggle */
+.skill-category.open i.fa-angle-right { transform: rotate(90deg); }
+
+.leadership-list { list-style: none; padding-left: 0;}
+.leadership-list li { margin-bottom: 10px; }
+.leadership-list li i { margin-right: 10px; color: var(--secondary-color); }
+
+#contact .contact-info p { margin: 10px 0; font-size: 1.1em;}
+#contact .contact-info p i { margin-right: 10px; width: 20px; text-align: center; color: var(--primary-color); }
+#contact .contact-info a:hover { color: var(--accent-color); }
+
+/* --- Interactive Placeholders --- */
+.interactive-placeholder {
+    border: 2px dashed var(--secondary-color);
+    padding: 20px;
+    background-color: #eef7f7; /* Lighter teal bg */
+    text-align: center;
+    color: var(--primary-color);
+    border-radius: var(--border-radius);
+}
+.interactive-placeholder h3 { color: var(--primary-color); }
+.interactive-placeholder h3 i { margin-right: 8px; }
+
+
+/* --- Buttons --- */
+.cta-button {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: var(--dark-text);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cta-button:hover {
+    background-color: #d48800; /* Darker accent */
+    color: var(--dark-text);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+.cta-button i { margin-left: 5px; }
+
+
+/* --- Footer --- */
 footer {
     text-align: center;
+    padding: 20px;
     margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #dee2e6;
-    font-size: 0.9em;
-    color: #6c757d;
+    background-color: var(--dark-text);
+    color: var(--light-text);
+    font-size: 0.9rem;
+}
+footer a { color: var(--accent-color); }
+
+/* --- Animations (using AOS - Animate On Scroll) --- */
+/* Define styles for elements before they are animated */
+[data-aos] {
+    opacity: 0;
+    transition-property: transform, opacity;
+}
+/* Styles applied by AOS */
+[data-aos="fade-up"] { transform: translateY(20px); }
+[data-aos="fade-in"] { /* Default fade */}
+
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; }
+    nav ul li { display: block; margin: 10px 0; } /* Stack nav items */
+    #skills .skills-container { grid-template-columns: 1fr; } /* Single column on smaller screens */
+}
+
+@media (max-width: 480px) {
+    body { font-size: 15px; }
+    header { padding: 1.5rem 0.5rem; }
+    .content-section, main section { padding: 20px 15px; margin: 20px auto; }
 }
