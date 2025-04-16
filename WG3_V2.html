@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radically Relevant, Timely, & Affordable AI-Supported Evidence Synthesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        .layer-container {
+            max-width: 800px; /* Limit width */
+            margin: 2rem auto; /* Center container */
+            padding-bottom: 5rem; /* Add padding at bottom */
+        }
+        /* Base styling for layer blocks */
+        .layer-block {
+            background-color: white;
+            border: 1px solid #dee2e6; /* Default border */
+            border-radius: 8px; /* Rounded corners */
+            /* margin-bottom: 1rem; */ /* Removed margin, handled by arrow separator or specific classes */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Softer shadow */
+            overflow: hidden; /* Needed for max-height transition */
+            width: 100%; /* Ensure full width within container */
+            margin-bottom: 0.75rem; /* Default space below blocks (mb-3) */
+        }
+        /* Specific style for Guiding Principles layer */
+        .guiding-layer {
+             border: 2px dashed #f59e0b; /* amber-500 */
+             background-color: white;
+             margin-bottom: 1.5rem; /* Increased space below Guiding Principles (mb-6) */
+        }
+         /* Specific style for Central Hub layer */
+        .hub-layer {
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            /* Margin below handled by arrow */
+        }
+        /* Standard layers */
+        .standard-layer {
+             /* Margin below handled by arrow or next block */
+        }
+
+        /* Styling for the clickable heading of each layer */
+        .layer-heading {
+            padding: 1rem 1.5rem; /* py-4 px-6 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid transparent; /* Transparent border initially */
+            transition: border-color 0.3s ease;
+        }
+        /* Add border when the block is expanded */
+        .layer-block.expanded .layer-heading {
+             border-bottom-color: #e5e7eb; /* gray-200 */
+        }
+        /* Container for title and subtitle */
+        .heading-content {
+            display: flex;
+            align-items: center; /* Align icon and text block */
+        }
+        /* Styling for the main title within the heading */
+        .layer-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* Semibold */
+        }
+         /* Styling for Font Awesome icons */
+         .layer-icon {
+             margin-right: 0.75rem; /* mr-3 */
+             width: 20px; /* Fixed width */
+             text-align: center;
+             flex-shrink: 0; /* Prevent icon shrinking */
+         }
+        /* Color coding icons AND Title Text */
+        .icon-guiding, .title-guiding { color: #d97706; } /* Amber 600 */
+        .icon-interaction, .title-interaction { color: #059669; } /* Emerald 600 */
+        .icon-hub, .title-hub { color: #2563eb; } /* Blue 600 */
+        .icon-foundation, .title-foundation { color: #7c3aed; } /* Violet 600 */
+
+        /* Styling for the subtitle */
+        .layer-subtitle {
+            font-size: 0.75rem; /* text-xs */
+            color: #6b7280; /* Gray-500 */
+            margin-top: 0.1rem;
+            font-weight: 400; /* Normal weight */
+        }
+        /* Styling for the expand/collapse indicator */
+        .indicator {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* Semibold */
+            color: #6b7280; /* Gray-500 */
+            margin-left: 1rem; /* Ensure space */
+            flex-shrink: 0; /* Prevent shrinking */
+            border: 1px solid #d1d5db; /* gray-300 */
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            line-height: 1;
+        }
+
+        /* Styling for the details area that expands */
+        .layer-details {
+            padding: 0 1.5rem; /* Padding only left/right initially */
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .layer-details.expanded {
+            padding: 1rem 1.5rem 1.5rem 1.5rem; /* Add top/bottom padding when expanded */
+            max-height: 1500px; /* Allow ample height */
+            opacity: 1;
+        }
+        /* Styling for each priority item listed within details */
+        .priority-item {
+            margin-bottom: 1rem; /* Space between items */
+            padding: 0.75rem; /* Add padding inside the item box */
+            border: 1px solid #e5e7eb; /* Add border to item box */
+            border-radius: 0.375rem; /* Rounded corners */
+            background-color: #f9fafb; /* Light background for item */
+        }
+         /* Reduce margin for last item in a flex row or last item overall */
+         .flex > .priority-item:last-child,
+         .layer-details > .priority-item:last-child {
+             margin-bottom: 0.25rem;
+         }
+        .priority-title {
+            font-weight: 600; /* semibold */
+            font-size: 0.875rem; /* text-sm */
+            margin-bottom: 0.1rem;
+            color: #4b5563; /* Gray-600 */
+        }
+        .priority-raised {
+            font-size: 0.75rem; /* text-xs */
+            color: #6b7280; /* Gray-500 */
+            margin-bottom: 0.25rem;
+        }
+        .priority-concepts {
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* Gray-600 */
+            padding-left: 0.5rem;
+        }
+         .priority-concepts ul {
+             list-style: disc;
+             list-style-position: inside;
+             margin-top: 0.25rem;
+         }
+         .concept-item {
+             margin-bottom: 0.25rem; /* Added spacing */
+         }
+         /* Styling for key concepts list within Guiding Principles */
+         .principles-concepts {
+             font-size: 0.875rem; /* text-sm */
+             color: #374151;
+         }
+         .principles-concepts ul {
+             list-style: disc;
+             list-style-position: inside;
+             margin-left: 0.5rem;
+         }
+         .principles-concepts li {
+             margin-bottom: 0.25rem;
+         }
+         /* Clickable name style */
+        .contributor-name {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-color: rgba(96, 165, 250, 0.5); /* Light blue underline */
+            transition: text-decoration-color 0.2s ease;
+        }
+        .contributor-name:hover {
+            text-decoration-color: rgba(59, 130, 246, 1); /* Darker blue on hover */
+        }
+        /* Modal Styles */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center; z-index: 50;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { max-height: 80vh; overflow-y: auto; }
+
+        /* Style for the separate gaps box - Top Right & Expandable */
+         #gaps-box {
+            position: fixed; /* Fixed position */
+            top: 5rem; /* MOVED DOWN further */
+            right: 1rem; /* Distance from right */
+            width: 320px; /* Specific width */
+            background-color: #fffbeb; /* amber-50 */
+            border: 1px solid #fbbf24; /* amber-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem; /* p-3 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            z-index: 40;
+            transition: max-height 0.5s ease-in-out; /* Add transition for height */
+            max-height: 45px; /* Initial height for title only - adjust as needed */
+            overflow: hidden;
+         }
+          #gaps-box.expanded {
+             max-height: 80vh; /* Max height when expanded */
+             overflow-y: auto; /* Add scroll when expanded */
+         }
+         #gaps-box-title {
+            color: #b45309; /* amber-700 */
+            font-weight: 600; /* font-semibold */
+            font-size: 0.875rem; /* text-sm */
+            margin-bottom: 0rem; /* No margin when collapsed */
+            padding-bottom: 0.25rem;
+            cursor: pointer; /* Make title clickable */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+         }
+          #gaps-box.expanded #gaps-box-title {
+              border-bottom: 1px solid #fbbf24; /* Add border when expanded */
+              margin-bottom: 0.5rem; /* Add margin back when expanded */
+          }
+         /* Style for individual gap items in the gaps box */
+         .gap-list { margin-top: 0.5rem; }
+         .gap-item { margin-top: 0.5rem; font-size: 0.75rem; color: #4b5563; margin-bottom: 0.25rem; }
+         .gap-item p { padding-left: 0.5rem; margin-bottom: 0; }
+         .gap-item strong { display: block; color: #1f2937; font-weight: 600; margin-bottom: 0.1rem; }
+
+         /* Arrow Separator Style - Re-added */
+        .arrow-separator {
+            text-align: center;
+            color: #9ca3af; /* gray-400 */
+            font-size: 1.25rem; /* text-xl */
+            margin: 0.5rem 0; /* Reduced margin */
+            line-height: 1;
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="gaps-box">
+        <h4 id="gaps-box-title">
+            <span>Identified Gaps (Needing Solutions)</span>
+            <span id="gaps-arrow" class="indicator">[+]</span> </h4>
+        <div id="gaps-box-content" class="hidden"> <div class="gap-list mt-2">
+                 <div class="gap-item">
+                    <strong>Full-text Screening (Initial Maturity):</strong>
+                    <p>Fewer validation studies vs. TiAb screening; accuracy, reproducibility, context understanding limit practical application.</p>
+                 </div>
+                 <div class="gap-item">
+                    <strong>Certainty of Evidence (GRADE) (Initial Maturity):</strong>
+                    <p>AI use minimal; no established automation tools; manual methods prevail; no validated LLM approach.</p>
+                 </div>
+                 <div class="gap-item">
+                    <strong>Citation Retrieval (Initial Maturity):</strong>
+                    <p>NLP tools for queries in development; uncertain performance/precision; not optimized for grey lit.</p>
+                 </div>
+                 <div class="gap-item">
+                    <strong>Dynamic Validation Framework (Initial Maturity):</strong>
+                    <p>Standardized framework needed; current evaluations use varied/private criteria; selection often subjective; lack of structured risk assessment.</p>
+                 </div>
+                 <div class="gap-item">
+                    <strong>Evidence Integration and Reporting (Initial Maturity):</strong>
+                    <p>No standardized workflows/tools for integrated synthesis; AI lacks features to contextualize/visualize/translate results for policymakers.</p>
+                 </div>
+                 <div class="gap-item">
+                    <strong>Citizen Engagement (Initial Maturity):</strong>
+                    <p>Lack of tracking for public use; limited public awareness of AI biases; engagement underdeveloped (esp. Global South); digital divides hinder access.</p>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layer-container">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">Radically Relevant, Timely, & Affordable AI-Supported Evidence Synthesis</h2>
+
+        <div class="layer-block guiding-layer" id="layer-guiding">
+            <div class="layer-heading" data-target="details-guiding">
+                <div class="heading-content">
+                     <i class="fas fa-compass layer-icon icon-guiding"></i>
+                     <div>
+                        <div class="layer-title title-guiding">Guiding Principles: Governance, Ethics & Equity</div>
+                        <div class="layer-subtitle">(Overarching considerations for the ecosystem)</div>
+                     </div>
+                </div>
+                <span class="indicator">[+]</span>
+            </div>
+            <div id="details-guiding" class="layer-details">
+                <p class="principles-concepts mb-2">Overarching principles ensuring responsible, fair, and sustainable development and use of AI in evidence synthesis. Key concepts derived from priorities include:</p>
+                <div class="principles-concepts">
+                    <ul>
+                        <li>Community-led / Co-designed Governance Models <span class="contributor-name" data-name="Pamela"><em>(Pamela)</em></span></li>
+                        <li>Interoperable Ecosystem Governance & 'Rules of Engagement' (<span class="contributor-name" data-name="James & Malcolm"><em>James & Malcolm</em></span>, <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>)</li>
+                        <li>Ethical / Legal / Risk Frameworks & Ethics-First Development (<span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>, <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>)</li>
+                        <li>Bias Audits, Human Validation & Responsible AI Practices (<span class="contributor-name" data-name="Aisha"><em>Aisha</em></span>, <span class="contributor-name" data-name="Anna"><em>Anna</em></span>)</li>
+                        <li>Transparency, Explainability & Accountability (<span class="contributor-name" data-name="Anna"><em>Anna</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>)</li>
+                        <li>Focus on Equity, Inclusion & Epistemic Justice (<span class="contributor-name" data-name="Aisha"><em>Aisha</em></span>, <span class="contributor-name" data-name="Ambika"><em>Ambika</em></span>, <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>)</li>
+                        <li>Sustainable & Green AI Principles (<span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="Anna"><em>Anna</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>)</li>
+                        <li>Stakeholder-inclusive Evaluation <span class="contributor-name" data-name="Ashritta"><em>(Ashritta)</em></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="layer-block standard-layer" id="layer-interaction">
+            <div class="layer-heading" data-target="details-interaction">
+                 <div class="heading-content">
+                    <i class="fas fa-users layer-icon icon-interaction"></i>
+                    <div>
+                        <div class="layer-title title-interaction">Interaction Layer: User Experience & Capacity Building</div>
+                        <div class="layer-subtitle">(How users engage with and benefit from the ecosystem)</div>
+                    </div>
+                </div>
+                <span class="indicator">[+]</span>
+            </div>
+            <div id="details-interaction" class="layer-details">
+                <div class="flex flex-wrap md:flex-nowrap gap-4"> <div class="priority-item w-full md:w-1/2">
+                        <div class="priority-title">P2: Multi-format & Multilingual Delivery</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Aisha"><em>Aisha</em></span>, <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span></div>
+                        <div class="priority-concepts">Translating evidence for non-specialists (podcasts, dashboards, voice notes, low-bandwidth), ensuring cultural relevance and inclusive design.</div>
+                    </div>
+                    <div class="priority-item w-full md:w-1/2">
+                        <div class="priority-title">P6: Credentialing & Capacity Building</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="Ambika"><em>Ambika</em></span>, <span class="contributor-name" data-name="JaEun"><em>JaEun</em></span></div>
+                        <div class="priority-concepts">Open education platforms, mentorship networks, training modules, bridging AI literacy gap, increasing Global South capacity & equity.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <div class="arrow-separator"><i class="fas fa-arrow-down"></i></div>
+
+        <div class="layer-block hub-layer" id="layer-hub">
+            <div class="layer-heading" data-target="details-hub">
+                 <div class="heading-content">
+                     <i class="fas fa-cogs layer-icon icon-hub"></i>
+                     <div>
+                        <div class="layer-title title-hub">Central Hub: AI Synthesis Platforms & Tools</div>
+                        <div class="layer-subtitle">(The core engines and environments for synthesis)</div>
+                    </div>
+                </div>
+                <span class="indicator">[+]</span>
+            </div>
+            <div id="details-hub" class="layer-details">
+                 <div class="flex flex-wrap lg:flex-nowrap gap-4 mb-4">
+                     <div class="priority-item w-full lg:w-1/3">
+                        <div class="priority-title">P1: AI Help Desk</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Ashritta"><em>Ashritta</em></span></div>
+                        <div class="priority-concepts">AI-enabled policy help desk integrated into CoE for real-time decision support, using integrated knowledge base.</div>
+                    </div>
+                     <div class="priority-item w-full lg:w-1/3">
+                        <div class="priority-title">P3: Adaptive QA & HITL Feedback</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Anna"><em>Anna</em></span>, <span class="contributor-name" data-name="Aurelie"><em>Aurelie</em></span>, <span class="contributor-name" data-name="James & Malcolm"><em>James & Malcolm</em></span></div>
+                        <div class="priority-concepts">Tools & platforms supporting dynamic QA, performance evaluation, validation infrastructure, HITL feedback loops, QA frameworks.</div>
+                    </div>
+                    <div class="priority-item w-full lg:w-1/3">
+                        <div class="priority-title">P7: Economic Analysis & Cost-Effectiveness</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Ashritta"><em>Ashritta</em></span></div>
+                        <div class="priority-concepts">Tools for cost per outcome comparison (DALYs/QALYs), scenario forecasting, automated effect size/cost coding.</div>
+                    </div>
+                 </div>
+                 <div class="priority-item mt-4">
+                     <div class="priority-title">Other Platform/Tool Concepts</div>
+                     <div class="priority-concepts">
+                         <ul>
+                            <li class='concept-item'>Evidence Synthesis Studio, One-Stop Hub concepts (<span class="contributor-name" data-name="James & Malcolm"><em>James & Malcolm</em></span>, <span class="contributor-name" data-name="JaEun"><em>JaEun</em></span>)</li>
+                            <li class='concept-item'>Semantic Search, Automation Tools, Chatbots (<span class="contributor-name" data-name="Aurelie"><em>Aurelie</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>, <span class="contributor-name" data-name="JaEun"><em>JaEun</em></span>)</li>
+                         </ul>
+                     </div>
+                 </div>
+            </div>
+        </div>
+
+        <div class="arrow-separator"><i class="fas fa-arrow-up"></i></div>
+
+
+        <div class="layer-block standard-layer" id="layer-foundation">
+            <div class="layer-heading" data-target="details-foundation">
+                 <div class="heading-content">
+                    <i class="fas fa-database layer-icon icon-foundation"></i>
+                    <div>
+                        <div class="layer-title title-foundation">Foundation: Data & Infrastructure</div>
+                        <div class="layer-subtitle">(The underlying data and technical structures)</div>
+                     </div>
+                </div>
+                <span class="indicator">[+]</span>
+            </div>
+            <div id="details-foundation" class="layer-details">
+                 <div class="flex flex-wrap md:flex-nowrap gap-4 mb-4">
+                    <div class="priority-item w-full md:w-1/2">
+                        <div class="priority-title">P4: Interoperability & Modular Governance (Infrastructure Aspects)</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="James & Malcolm"><em>James & Malcolm</em></span></div>
+                        <div class="priority-concepts">Shared infrastructure, decentralized data systems, open standards, APIs, modular architectures to prevent fragmentation.</div>
+                    </div>
+                    <div class="priority-item w-full md:w-1/2">
+                        <div class="priority-title">P5: Green & Sustainable AI (Infrastructure Aspects)</div>
+                        <div class="priority-raised">Raised by: <span class="contributor-name" data-name="Pamela"><em>Pamela</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>, <span class="contributor-name" data-name="Anna"><em>Anna</em></span></div>
+                        <div class="priority-concepts">Sustainable data infrastructure, energy-efficient data systems, resource-aware platforms.</div>
+                    </div>
+                 </div>
+                 <div class="priority-item">
+                     <div class="priority-title">Other Data Concepts</div>
+                     <div class="priority-concepts">
+                         <ul>
+                            <li class='concept-item'>FAIR Data Principles & Conversion (<span class="contributor-name" data-name="Anna"><em>Anna</em></span>, <span class="contributor-name" data-name="Ronald"><em>Ronald</em></span>)</li>
+                            <li class='concept-item'>Metadata Standards & QC <span class="contributor-name" data-name="Ronald"><em>(Ronald)</em></span></li>
+                            <li class='concept-item'>Access to Diverse Data (Grey Lit, Local) (<span class="contributor-name" data-name="Ambika"><em>Ambika</em></span>, <span class="contributor-name" data-name="Aisha"><em>Aisha</em></span>)</li>
+                            <li class='concept-item'>Reusable Evidence Base <span class="contributor-name" data-name="James & Malcolm"><em>(James & Malcolm)</em></span></li>
+                         </ul>
+                     </div>
+                 </div>
+            </div>
+        </div>
+
+        <div class="text-center text-xs text-gray-500 mt-4 pb-4">
+            Click headers to expand/collapse details. Click names for contributor points.
+        </div>
+
+</div>
+
+ <div id="contributorModal" class="modal">
+    <div class="modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-lg relative">
+        <button id="closeModal" class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+        <h2 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800">Contributor Details</h2>
+        <div id="modalContent" class="text-sm text-gray-700 space-y-2"></div>
+    </div>
+</div>
+
+
+<script>
+    // --- Data Mapping: Contributor Name -> Key Points ---
+    const contributorData = {
+        "James & Malcolm": `<ul><li class='mb-1'>• Proposed 'Evidence Synthesis Studio': Integrated desktop/platform environment.</li><li class='mb-1'>• Plugin Architecture (CESPIA): Allows integration of various tools.</li><li class='mb-1'>• Chatbot Interface: Guides users through synthesis workflow.</li><li class='mb-1'>• Cumulative Reusable Evidence Base: For validation and reuse.</li><li class='mb-1'>• Tool Validation Network: For assessing tool performance.</li><li class='mb-1'>• Governance: Emphasized need for clear 'rules of engagement' for ecosystem.</li></ul>`,
+        "Pamela": `<ul><li class='mb-1'>• AI-Powered Global Platform: Connecting stakeholders globally.</li><li class='mb-1'>• Open-Source & Modular: Emphasizing flexibility and low environmental footprint (Green AI).</li><li class='mb-1'>• Global South Focus: Accessibility, low-bandwidth formats, local validation.</li><li class='mb-1'>• Open Education Platform: For capacity building (multilingual).</li><li class='mb-1'>• Diverse Outputs: Dashboards, podcasts, briefs, voice tools.</li><li class='mb-1'>• Governance: Community-led, co-designed with Global South, federated systems.</li><li class='mb-1'>• Sustainability: Inclusive funding models, sustainable infrastructure, anti-fragmentation.</li></ul>`,
+        "JaEun": `<ul><li class='mb-1'>• One-Stop AI Hub: Centralized public website for evidence.</li><li class='mb-1'>• Key Features: Interactive SDG map, AI Chatbot (instant synthesis with source refs), public synthesis tool.</li><li class='mb-1'>• Capacity Building: Online training modules for evidence literacy.</li><li class='mb-1'>• Monitoring: Included performance & accuracy monitoring.</li></ul>`,
+        "Ashritta": `<ul><li class='mb-1'>• Global Centre of Excellence: North-South interdisciplinary hub.</li><li class='mb-1'>• AI-Enabled Help Desk: For timely synthesis on priority questions.</li><li class='mb-1'>• Integrated Knowledge Base: Providing context and identifying gaps.</li><li class='mb-1'>• Cost-Effectiveness Analysis: Tools for QALY/DALY comparison & scenario analysis.</li><li class='mb-1'>• AI-Powered Dashboard: Visualizing effect sizes, cost-effectiveness, context.</li><li class='mb-1'>• QA Framework: Ensuring quality, veracity, robustness.</li></ul>`,
+        "Aisha": `<ul><li class='mb-1'>• EduLens: Focus on democratizing *education* research.</li><li class='mb-1'>• AI as Scanner & Cultural Translator: Adapting insights into actionable, multilingual formats (Urdu/Sindhi/Pashto voice notes, dashboards).</li><li class='mb-1'>• Ethical AI: Bias audits, human validation, community co-design (esp. rural Pakistan).</li><li class='mb-1'>• Epistemic Justice: Ensuring Global South evidence informs local contexts.</li></ul>`,
+        "Ambika": `<ul><li class='mb-1'>• LMIC Capacity Building: Addressing technical skills and institutional framework gaps.</li><li class='mb-1'>• Data Access: Including local reports and grey literature.</li><li class='mb-1'>• Language Barriers: Need to overcome for non-English speakers.</li><li class='mb-1'>• Equitable Participation: Ensuring LMIC researcher input.</li><li class='mb-1'>• Collaboration Networks: Fostering South-South / South-North links.</li></ul>`,
+        "Anna": `<ul><li class='mb-1'>• Approach over Product: Focus on foundational data issues.</li><li class='mb-1'>• FAIR Data Journeys: Using AI to make data FAIR (convert legacy, generate FAIR).</li><li class='mb-1'>• AI-Human Collaboration: For data curation and synthesis.</li><li class='mb-1'>• Continuous QA: Real-time evaluation and improvement of AI models.</li><li class='mb-1'>• Responsible AI: Avoid new harms (e.g., environmental), amplifying inequality, compromising rigor. Avoid AI as 'bolt-on' for poor practice.</li></ul>`,
+        "Ronald": `<ul><li class='mb-1'>• Real-time Integration & User-Friendly Interfaces: Enhancing timeliness and usability.</li><li class='mb-1'>• Automation: Screening, extraction, summarization, living synthesis.</li><li class='mb-1'>• FAIR Data & Standards: Emphasizing open data principles.</li><li class='mb-1'>• Ethics & Transparency: Bias detection/prevention processes.</li><li class='mb-1'>• Open-Source & Cloud: Lowering costs and increasing accessibility.</li><li class='mb-1'>• User Responsiveness: DEI principles, personalization, user support.</li><li class='mb-1'>• Governance Infrastructure: Secure storage, data pipelines, legal/regulatory/risk frameworks.</li></ul>`,
+        "Aurelie": `<ul><li class='mb-1'>• AI System for Diverse Sources: Synthesizing from wide repositories.</li><li class='mb-1'>• Semantic Search: Natural language queries with tunable accuracy/risk levels.</li><li class='mb-1'>• Key Features: Summarization, insights, drafting capabilities.</li><li class='mb-1'>• Technical Needs: API connectivity, feedback/evaluation tools.</li><li class='mb-1'>• Modularity: For future-proofing and 'best-in-class' components.</li><li class='mb-1'>• Phased Approach: Prioritizing requirements and using POCs.</li></ul>`
+    };
+
+    // --- Modal Elements ---
+    const modal = document.getElementById('contributorModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const closeModalButton = document.getElementById('closeModal');
+
+    // --- Event Listener for Layer Expansion/Collapse ---
+    document.querySelectorAll('.layer-heading').forEach(heading => {
+        heading.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const detailsDiv = document.getElementById(targetId);
+            const indicatorSpan = this.querySelector('.indicator');
+            const layerBlock = this.closest('.layer-block');
+
+            if (detailsDiv && indicatorSpan && layerBlock) {
+                const isExpanded = detailsDiv.classList.contains('expanded');
+                detailsDiv.classList.toggle('expanded');
+                indicatorSpan.classList.toggle('expanded'); // Used for potential indicator styling/rotation
+                layerBlock.classList.toggle('expanded'); // Add/remove class on parent block
+                indicatorSpan.textContent = isExpanded ? '[+]' : '[-]'; // Toggle indicator text
+            }
+        });
+    });
+
+    // --- Event Listener for Contributor Name Clicks ---
+     document.addEventListener('click', function(event) {
+        const contributorSpan = event.target.closest('.contributor-name');
+        if (contributorSpan && modal) {
+            // Prevent the layer from expanding/collapsing when clicking a name inside it
+            event.stopPropagation();
+
+            const name = contributorSpan.dataset.name;
+            const data = contributorData[name];
+            if (data && modalTitle && modalContent) {
+                modalTitle.textContent = name;
+                modalContent.innerHTML = data;
+                modal.classList.add('active');
+            }
+        }
+     });
+
+    // --- Event Listener for Closing Modal ---
+     if(closeModalButton && modal) {
+         closeModalButton.addEventListener('click', function() {
+             modal.classList.remove('active');
+         });
+         modal.addEventListener('click', function(event) {
+             // Close if clicking on the modal backdrop
+             if (event.target === modal) {
+                 modal.classList.remove('active');
+             }
+         });
+     }
+
+    // --- Event Listener for Gaps Box Title Click ---
+    const gapsBoxTitle = document.getElementById('gaps-box-title');
+    if (gapsBoxTitle) {
+        gapsBoxTitle.addEventListener('click', function() {
+            const gapsBox = document.getElementById('gaps-box');
+            const gapsBoxContent = document.getElementById('gaps-box-content');
+            const gapsArrow = document.getElementById('gaps-arrow');
+            if (gapsBox && gapsBoxContent && gapsArrow) {
+                gapsBox.classList.toggle('expanded');
+                gapsBoxContent.classList.toggle('hidden');
+                // Toggle indicator - using '+' and '-'
+                gapsArrow.textContent = gapsBox.classList.contains('expanded') ? '[-]' : '[+]';
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>
