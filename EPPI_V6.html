@@ -4,61 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPPI-Mapper Data Template (Experimental)</title>
+    <title>EPPI-Mapper Template (Multi-Select, Checkbox Types, Row Mgmt, Export)</title> <!-- Updated Title -->
     <style>
-        /* CSS Styles (Unchanged from previous version) */
-        body { font-family: sans-serif; margin: 20px; font-size: 0.95em; }
-        .section { margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; background-color: #fff; }
-        .section h4 { margin-top: 0; color: #337ab7; }
+        /* CSS Styles */
+        body { font-family: sans-serif; margin: 20px; font-size: 0.95em; background-color: #f4f4f4; }
+        .section { margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; background-color: #fff; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .section h4, .section h5 { margin-top: 0; color: #337ab7; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px; }
+        select[multiple] { height: auto; min-height: 80px; background-color: white; } /* Style multi-select */
         .dataEntryTable textarea { height: 4em; min-height: 3em; resize: vertical; margin-bottom: 0; }
-        .dataEntryTable input, .dataEntryTable select { margin-bottom: 0; }
-        input[type="checkbox"] { margin-right: 5px; vertical-align: middle; }
+        .dataEntryTable input, .dataEntryTable select, .dataEntryTable input[type="checkbox"] { margin-bottom: 0; vertical-align: middle;}
+        /* Style for 0/1 select in data table */
+        .dataEntryTable .checkbox-option-cell select { width: 45px; padding: 4px; text-align: center; font-size: 0.9em;} /* Applied to specific cells */
+        input[type="checkbox"] { margin-right: 5px; vertical-align: middle; width: auto;}
         textarea { height: 100px; }
         button { padding: 8px 15px; margin: 5px 2px; cursor: pointer; border: 1px solid #ccc; background-color: #f8f8f8; border-radius: 4px; color: #333; }
         button:hover { background-color: #e7e7e7; border-color: #adadad; }
-        #defineColumnsBtn, #enterDataBtn, #generateCombinedJSON { background-color: #337ab7; color: white; border-color: #2e6da4; }
-        #defineColumnsBtn:hover, #enterDataBtn:hover, #generateCombinedJSON:hover { background-color: #286090; border-color: #204d74; }
+        #addDynamicColumnBtn, #enterDataBtnInline, #generateCombinedJSON, #exportStateBtn, #importStateBtn { background-color: #337ab7; color: white; border-color: #2e6da4; }
+        #addDynamicColumnBtn:hover, #enterDataBtnInline:hover, #generateCombinedJSON:hover, #exportStateBtn:hover, #importStateBtn:hover { background-color: #286090; border-color: #204d74; }
         .instruction { font-style: italic; color: #777; font-size: 0.9em; margin-top: 2px; margin-bottom: 10px; }
         .mandatory::after { content: "*"; color: red; margin-left: 3px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: top; word-wrap: break-word; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; table-layout: auto; } /* Changed table-layout to auto for flexibility */
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; word-wrap: break-word; font-size: 0.95em;}
         th { background-color: #f5f5f5; font-weight: bold; white-space: normal; }
-        #predefinedColumnsTable th:nth-child(1), #predefinedColumnsTable td:nth-child(1) { width: 10%; text-align: center; }
-        #predefinedColumnsTable th:nth-child(2), #predefinedColumnsTable td:nth-child(2) { width: 20%; }
-        #predefinedColumnsTable th:nth-child(3), #predefinedColumnsTable td:nth-child(3) { width: 15%; }
-        #predefinedColumnsTable th:nth-child(4), #predefinedColumnsTable td:nth-child(4) { width: 55%; }
-        .columnDefinitionTable th:nth-child(1), .columnDefinitionTable td:nth-child(1) { width: 25%; }
-        .columnDefinitionTable th:nth-child(2), .columnDefinitionTable td:nth-child(2) { width: 15%; }
-        .columnDefinitionTable th:nth-child(3), .columnDefinitionTable td:nth-child(3) { width: 15%; text-align: center;}
-        .columnDefinitionTable th:nth-child(4), .columnDefinitionTable td:nth-child(4) { width: 45%; }
-        .dataEntryTable th:nth-child(1) { width: 8%; } /* Item */
-        .dataEntryTable th:nth-child(2) { width: 15%; } /* Item Title */
-        .dataEntryTable th:nth-child(3) { width: 12%; } /* URL */
+        /* Widths for Predefined Columns Definition Table */
+        #predefinedColumnsTable th:nth-child(1), #predefinedColumnsTable td:nth-child(1) { width: 10%; text-align: center; } /* Include */
+        #predefinedColumnsTable th:nth-child(2), #predefinedColumnsTable td:nth-child(2) { width: 20%; } /* Field Name */
+        #predefinedColumnsTable th:nth-child(3), #predefinedColumnsTable td:nth-child(3) { width: 15%; } /* Data Type */
+        #predefinedColumnsTable th:nth-child(4), #predefinedColumnsTable td:nth-child(4) { width: 15%; text-align: center;} /* L2? */
+        #predefinedColumnsTable th:nth-child(5), #predefinedColumnsTable td:nth-child(5) { width: 40%; } /* Options/Labels */
+        /* Widths for Dynamic Columns Definition Table - Adjusted for Delete Button */
+        .columnDefinitionTable th:nth-child(1), .columnDefinitionTable td:nth-child(1) { width: 25%; } /* Col Title */
+        .columnDefinitionTable th:nth-child(2), .columnDefinitionTable td:nth-child(2) { width: 15%; } /* Col Type */
+        .columnDefinitionTable th:nth-child(3), .columnDefinitionTable td:nth-child(3) { width: 15%; text-align: center;} /* L2? */
+        .columnDefinitionTable th:nth-child(4), .columnDefinitionTable td:nth-child(4) { width: 35%; } /* Options/Labels */
+        .columnDefinitionTable th:nth-child(5), .columnDefinitionTable td:nth-child(5) { width: 10%; text-align: center;} /* Delete */
+        /* Widths for Data Entry Table - Adjusted for Auto Layout */
+        .dataEntryTable th.col-item-num { width: 6%; }
+        .dataEntryTable th.col-item-title { width: 15%; }
+        .dataEntryTable th.col-item-url { width: 12%; }
+        .dataEntryTable th.col-item-abstract { width: 20%; }
+        .dataEntryTable th.col-delete { width: 7%; text-align: center;}
+        .dataEntryTable th.col-codable-group { text-align: center; background-color: #eef; } /* Style for grouped headers */
+        .dataEntryTable th.col-checkbox-option { background-color: #f8f8f8; font-weight: normal; font-size: 0.9em; } /* Style for sub-headers */
+        .dataEntryTable td.checkbox-option-cell { text-align: center; } /* Center the 0/1 selects */
+
         .columnDefinitionTable input[type="text"], .columnDefinitionTable select, #predefinedColumnsTable select { width: 98%; }
-        .dropdown-options-container { margin-top: 5px; padding: 5px; background-color: #fafafa; border: 1px dashed #eee; min-height: 40px; }
-        .dropdown-option { border-left: 3px solid #eee; padding-left: 10px; margin-bottom: 10px; padding-bottom: 5px; }
-        .dropdown-level2-options { margin-top: 5px; border: 1px solid #eee; padding: 5px; background-color: #f0f0f0; margin-left: 15px; }
+        .options-container-placeholder { display: none; }
+        .dropdown-options-container, .checkbox-options-container { margin-top: 5px; padding: 10px; background-color: #fafafa; border: 1px dashed #eee; min-height: 40px; border-radius: 4px; display: flex; flex-direction: column; gap: 5px;}
+        .dropdown-option, .checkbox-option { border-left: 3px solid #eee; padding-left: 10px; padding-bottom: 5px; display: flex; align-items: center; margin-bottom: 5px; }
+        .checkbox-option input[type="text"] { flex-grow: 1; margin-right: 5px; }
+        .dropdown-option input[type="text"] { flex-grow: 1; margin-right: 5px; }
+        .dropdown-level2-options { margin-top: 5px; border: 1px solid #eee; padding: 5px; background-color: #f0f0f0; margin-left: 15px; border-radius: 4px; display: flex; flex-direction: column; gap: 5px;}
+        .dataEntryTable .checkbox-group-cell div { display: block; margin-bottom: 3px; white-space: nowrap; } /* Style for standard checkboxes */
+        .dataEntryTable .checkbox-group-cell-01 div { display: block; margin-bottom: 2px; white-space: nowrap; }
+        .dataEntryTable .checkbox-group-cell-01 label { margin-right: 3px; min-width: 80px; display: inline-block; }
+        .dataEntryTable .checkbox-group-cell-01 select { width: auto; padding: 3px; margin-left: 2px; font-size: 0.9em; }
         .success-message { color: green; font-weight: bold; margin-top: 5px; display: inline-block; margin-left: 10px; }
-        .diagram-display { margin-top: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; overflow-x: auto; }
-         .diagram-display h5 { margin-top: 0; color: #337ab7; }
-        .diagram-container { display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 10px; min-width: fit-content; }
-        .diagram-column { margin-right: 25px; flex-shrink: 0; }
-        .level1-to-level2 { margin-left: 15px; margin-top: 5px; }
-        .level1-box { border: 1px solid #8cc9f2; padding: 5px 8px; text-align: left; min-width: 150px; max-width: 220px; background-color: #eaf7ff; color: #005fa3; position: relative; font-size: 0.9em; margin-bottom: 5px; word-wrap: break-word; border-radius: 3px; }
-        .diagram-column > .level1-box { background-color: #d0e8ff; font-weight: bold; }
-        .level1-box::before { content: ""; position: absolute; left: -15px; top: 50%; transform: translateY(-50%); width: 15px; height: 1px; background-color: #a0d4f5; }
-        .diagram-column > .level1-box::before { display: none; }
-        .level2-options { margin-left: 30px; margin-top: 5px; }
-        .level2-box { border: 1px solid #a3d8a3; padding: 4px 6px; text-align: left; min-width: 130px; max-width: 200px; background-color: #f0fff0; color: #3d8b3d; margin: 3px 0; font-size: 0.85em; position: relative; word-wrap: break-word; border-radius: 3px; }
-        .level2-box::before { content: ""; position: absolute; left: -30px; top: 50%; transform: translateY(-50%); width: 30px; height: 1px; background-color: #8fbc8f; }
+        /* Diagram Styles */
+        .diagram-display { margin-top: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; overflow-x: auto; border-radius: 4px; min-height: 50px;}
+        .diagram-display h5 { margin-top: 0; color: #337ab7; }
+        .diagram-container { display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 10px; min-width: fit-content; gap: 20px;}
+        .diagram-column { border: 1px solid #ddd; padding: 10px; border-radius: 4px; background-color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; min-width: 180px;}
+        .diagram-column-title { font-weight: bold; color: #337ab7; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; text-align: center; font-size: 1.05em; }
+        .diagram-column-type { font-style: italic; color: #777; text-align: center; margin-bottom: 10px; font-size: 0.9em; }
+        .diagram-option-item { background-color: #f8f9fa; border: 1px solid #eee; border-left: 3px solid #6c757d; padding: 4px 8px; border-radius: 3px; font-size: 0.9em; word-break: break-word; }
+        .diagram-option-l2 { margin-left: 15px; border-left-color: #28a745; background-color: #f0fff0; }
+        /* Loading Overlay */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; display: none; }
         .loading-spinner { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1.5s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #jsonDisplay { white-space: pre-wrap; font-family: monospace; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; margin-top: 5px; max-height: 300px; overflow-y: auto; border-radius: 4px; }
+        /* JSON Output */
+        #jsonDisplay { white-space: pre-wrap; font-family: monospace; border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; margin-top: 5px; max-height: 400px; overflow-y: auto; border-radius: 4px; }
         #downloadJSON { margin-top: 10px; }
         select option:disabled { font-weight: bold; color: #777; background-color: #eee; }
+        #localStorageStatus { font-style: italic; color: green; margin-left: 15px; font-size: 0.9em;}
+        /* Message Window Styles */
+        #messageWindow { background-color: #e7f3fe; border-left: 6px solid #2196F3; padding: 15px; margin-bottom: 20px; border-radius: 4px; position: relative; }
+        #messageWindow h4 { margin-top: 0; color: #1a73e8; }
+        #messageWindow p { margin-bottom: 5px; line-height: 1.4; }
+        #messageWindow ol { margin-top: 10px; padding-left: 20px; }
+        #messageWindow li { margin-bottom: 5px; }
+        #closeMessageBtn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #555; }
+        /* Error Display Styles */
+        #errorDisplay { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 15px; margin-bottom: 20px; border-radius: 4px; display: none; position: relative; }
+        #errorDisplay h5 { margin-top: 0; color: #721c24; }
+        #errorDisplay pre { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; }
+        #closeErrorBtn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #721c24; }
+        /* Add/Remove/Delete buttons */
+        .add-option-button { margin-top: 10px; }
+        .remove-option-button, .delete-column-button, .delete-row-button { background-color: transparent; border: none; color: #cc0000; cursor: pointer; font-size: 1.1em; padding: 0 5px; margin-left: 5px; vertical-align: middle; }
+        .remove-option-button:hover, .delete-column-button:hover, .delete-row-button:hover { color: #ff0000; }
     </style>
 </head>
 
@@ -67,132 +104,207 @@
         <div class="loading-spinner"></div>
     </div>
 
-    <h1>EPPI-Mapper Data Template (Experimental - Metadata as Codes)</h1>
-    <p class="instruction" style="color: orange; font-weight: bold;">Warning: This configuration treats standard metadata fields (Authors, Year, etc.) as codable attributes. The generated JSON, especially Part 1 (CodeSets), will likely be non-standard for EPPI-Mapper regarding these fields.</p>
-    <p>Enter information for the study. Each row in the table corresponds to a study item.</p>
+    <div id="errorDisplay">
+        <button id="closeErrorBtn" title="Close Error">×</button>
+        <h5>JavaScript Error Occurred</h5>
+        <pre id="errorMessage"></pre>
+    </div>
 
+    <h1>EPPI-Mapper Data Template (Multi-Select, Checkbox Types, Row Mgmt, Export)</h1>
+
+    <!-- UPDATED Instructions -->
+    <div id="messageWindow" class="section">
+        <button id="closeMessageBtn" title="Close Message">×</button>
+        <h4>Getting Started</h4>
+        <p>Follow these steps to create your data template:</p>
+        <ol>
+            <li>Enter the overall **Study Title**.</li>
+            <li>Configure **Predefined Columns** (Include?, Type, Options). Select standard fields like Country, Year, etc.</li>
+            <li>Use **"Add Codable Column"** to define any additional custom columns needed.</li>
+            <li>Define columns (Title, Type, Options, L2?). Use 'X' buttons to delete columns or options.</li>
+            <li>**Column Types Explained:**
+                <ul>
+                    <li>*Text/Number*: Free text/numeric.</li>
+                    <li>*Dropdown (Single Option)*: Select only one option (e.g., Study Quality: High).</li>
+                    <li>*Dropdown (Multi Option)*: Select multiple options using Ctrl/Cmd+Click (e.g., Countries: UK, USA). Paste data using comma (,) separation.</li>
+                    <li>*Checkbox Group*: Standard multi-select checkboxes (e.g., Population: Adults, Children). Paste data using semicolon (;) separation.</li>
+                    <li>*Checkbox (0/1)*: Creates a separate column for each option, allowing 0 or 1 input (e.g., SDG applicability - SDG1: 1, SDG2: 0, SDG3: 1). Paste data using semicolon (;) separation for the 0/1 values corresponding to each option.</li>
+                </ul>
+            </li>
+             <li>Review the **Codable Columns Structure Diagram**.</li>
+            <li>Set the **Initial Number of Data Rows** below.</li>
+            <li>Click **"Create/Recreate Data Entry Table"**.</li>
+            <li>Enter your data. Use **"Add Data Row"** / **"X" (Delete Row)** buttons as needed.</li>
+            <li>Use **Save/Load Data** (Browser) or **Export/Import State** (File).</li>
+            <li>Use **Generate JSON** buttons for EPPI-Mapper output.</li>
+        </ol>
+    </div>
+    <!-- END UPDATED Instructions -->
 
     <div class="section">
         <h4>Basic Study Information (Overall Study)</h4>
         <div class="field">
             <label for="studyTitle" class="mandatory">Study Title:</label>
             <input type="text" id="studyTitle" name="studyTitle">
-            <p class="instruction">Used for ParentTitle in JSON References. (Overall study authors/year/abstract are now entered per item).</p>
+            <p class="instruction">Used for ParentTitle in JSON References.</p>
         </div>
-        </div>
+    </div>
 
     <div class="section">
-        <h4>Predefined "Codable" Columns (Experimental - Using Metadata Fields)</h4>
-        <p class="instruction">Select metadata fields to treat as codable attributes. Define their type and options.</p>
+        <h4>Predefined Codable Columns</h4>
+        <p class="instruction">Select standard fields/codes to include. Define their type and options/labels.</p>
         <table id="predefinedColumnsTable">
-             <thead> <tr> <th>Include?</th> <th>Field Name</th> <th>Data Type</th> <th>Options Definition (if Dropdown)</th> </tr> </thead>
-             <tbody> </tbody>
+            <thead>
+                <tr>
+                    <th>Include?</th>
+                    <th>Field Name</th>
+                    <th>Data Type</th>
+                    <th>L2 (Drop)?</th>
+                    <th>Options/Labels Definition</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
     </div>
-    <div class="section">
-        <h4>Dynamic Codable Columns Configuration</h4>
-        <div class="field"> <label for="numRows">Number of Rows (Study Items):</label> <input type="number" id="numRows" min="1" value="5"> </div>
-        <div class="field"> <label for="numCols">Number of Dynamic Codable Columns:</label> <p class="instruction">Select the number of additional codable columns needed AFTER the included predefined ones.</p>
-            <select id="numCols"> <option value="0" selected>0</option> <option value="1">1</option> <option value="2">2</option> <option value="3">3</option> <option value="4">4</option> <option value="5">5</option> <option value="6">6</option> <option value="7">7</option> <option value="8">8</option> <option value="9">9</option> <option value="10">10</option> <option value="11">11</option> <option value="12">12</option> </select>
-        </div>
-        <button id="defineColumnsBtn">Define Dynamic Columns</button>
 
-        <div class="columnDefinitionArea" id="columnDefinitionArea" style="display: none;">
-            <h5>Dynamic Codable Column Definitions</h5> <p class="instruction">Define the title, type, and options for each dynamic column.</p>
+    <div class="section">
+        <h4>Codable Columns Configuration</h4>
+        <button id="addDynamicColumnBtn">Add Codable Column</button>
+        <p class="instruction">Use the button above to add columns. Define title, type, options/labels, and L2 status for each. Use the 'X' to delete a column row.</p>
+        <div class="columnDefinitionArea" id="columnDefinitionArea" >
             <table class="columnDefinitionTable" id="columnDefinitionTable">
-                 <thead> <tr> <th>Column Title</th> <th>Column Type</th> <th>Has Level 2 Options?</th> <th>Dropdown Options (if applicable)</th> </tr> </thead>
-                 <tbody> </tbody>
+                <thead>
+                    <tr>
+                        <th>Column Title</th>
+                        <th>Column Type</th>
+                        <th>L2 (Dropdown)?</th>
+                        <th>Options/Labels Definition</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
             </table>
         </div>
-         <div class="diagram-display" id="diagramDisplay" style="display:none;"> </div>
-        <button id="enterDataBtn" style="display:none;">Create Data Entry Table</button>
+        <div class="diagram-display" id="diagramDisplay" style="display:none;">
+             <h5>Codable Columns Structure Diagram</h5>
+             <p class="instruction">Visual representation of all included predefined and defined dynamic columns.</p>
+             <div id="diagramContainer" class="diagram-container"></div>
+        </div>
+    </div>
+
+     <div class="section">
+        <h4>Data Entry Table Actions & Persistence</h4>
+        <div class="field" style="max-width: 200px; display: inline-block; margin-right: 20px;">
+            <label for="numRows">Initial Number of Data Rows:</label>
+            <input type="number" id="numRows" min="0" value="3">
+        </div>
+        <button id="enterDataBtnInline">Create/Recreate Data Entry Table</button>
+        <button id="addDataRowBtn">Add Data Row</button>
+        <button id="pasteDataBtnInline">Paste Data from Excel</button> <div id="pasteSuccessMessageInline" class="success-message" style="display:none;">Data pasted!</div>
+        <button id="clearTableBtnInline">Clear Table Data</button>
+         <hr style="margin: 15px 0;">
+         <button id="saveDataBtn">Save Data</button>
+         <button id="loadDataBtn">Load Data</button>
+         <button id="clearSavedDataBtn" style="background-color: #f8d7da; color: #721c24;">Clear Saved Data</button>
+         <span id="localStorageStatus"></span>
+         <hr style="margin: 15px 0;">
+          <button id="exportStateBtn" title="Download all configuration and table data to a file">Export State to File</button>
+          <label for="importFile" style="display:inline-block; margin-left: 10px;">
+              <button id="importStateBtn" type="button" onclick="document.getElementById('importFile').click();" title="Load configuration and table data from a previously exported file">Import State from File</button>
+          </label>
+          <input type="file" id="importFile" accept=".json" style="display: none;">
+          <span id="importStatus" class="success-message" style="display:none;"></span>
     </div>
 
     <div class="section">
         <h4>Data Entry Table</h4>
-        <div class="dataEntryArea" id="dataEntryArea" style="display: none;">
-            <h5>Enter Data For Each Study Item</h5> <p class="instruction">Enter identifier, title, URL, and data/selections for the included "codable" columns below.</p>
-            <button id="pasteDataBtn">Paste Data from Excel</button> <div id="pasteSuccessMessage" class="success-message" style="display:none;">Data pasted!</div> <button id="clearTableBtn">Clear Table</button>
-            <table class="dataEntryTable" id="dataEntryTable"> <thead> </thead> <tbody> </tbody> </table>
+        <div class="dataEntryArea" id="dataEntryArea" style="display: none; overflow-x: auto;">
+            <table class="dataEntryTable" id="dataEntryTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 
     <div class="section">
-        <h4>Data Export</h4>
-         <p class="instruction">Generate JSON. Part 1 defines included 'Dropdown' columns as CodeSets. Part 2 populates Reference metadata mainly from defaults/inputs and adds selected/entered data for ALL included columns to the 'Codes' array.</p>
-        <button id="generatePart1JSON">Generate Part 1 JSON (CodeSets)</button> <button id="generatePart2JSON">Generate Part 2 JSON (References)</button> <button id="generateCombinedJSON">Generate Combined JSON</button>
-         <div id="jsonDisplayArea" style="margin-top: 15px; display: none;"> <label for="jsonDisplay">JSON Output (Copy-Paste):</label> <div id="jsonDisplay"></div> <button id="downloadJSON">Download JSON</button> </div>
+        <h4>Data Export (for EPPI-Mapper)</h4>
+         <p class="instruction">Generate JSON based on the minimal EPPI-Mapper format (Sample 1). Part 1 defines columns/options. Part 2 defines references and links codes via AttributeID.</p>
+        <button id="generatePart1JSON">Generate Part 1 JSON (CodeSets)</button>
+        <button id="generatePart2JSON">Generate Part 2 JSON (References)</button>
+        <button id="generateCombinedJSON">Generate Combined JSON</button>
+         <div id="jsonDisplayArea" style="margin-top: 15px; display: none;">
+             <label for="jsonDisplay">JSON Output (Copy-Paste):</label>
+             <div id="jsonDisplay"></div>
+             <button id="downloadJSON">Download JSON</button>
+         </div>
          <textarea id="jsonOutput" style="display:none;"></textarea>
-    </div>
+     </div>
+<!-- END OF CHUNK 1 -->
 
-    <script>
-        // ========================= Helper Functions =========================
-        function showLoadingOverlay() { document.getElementById('loadingOverlay').style.display = 'flex'; }
-        function hideLoadingOverlay() { document.getElementById('loadingOverlay').style.display = 'none'; }
-        function validateNumRows(numRows) { if (isNaN(numRows) || numRows <= 0) { alert("Number of rows must be a positive number."); return false; } return true; }
+<script>
+        // ******** Global Error Handlers (Unchanged) ********
+        const errorDisplayDiv = document.getElementById('errorDisplay');
+        const errorMessagePre = document.getElementById('errorMessage');
+        const closeErrorBtn = document.getElementById('closeErrorBtn');
+        function displayError(message, source = 'Unknown', lineno = 'N/A', error = null) { console.error("Caught Error:", message, source, lineno, error); if (errorDisplayDiv && errorMessagePre) { errorMessagePre.textContent = `Message: ${message}\nSource: ${source}\nLine: ${lineno}\nError: ${error ? (error.stack || error) : 'N/A'}`; errorDisplayDiv.style.display = 'block'; errorDisplayDiv.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else { alert(`JS ERROR (Fallback):\nMessage: ${message}\nSource: ${source}\nLine: ${lineno}\nError: ${error}`); } hideLoadingOverlay(); }
+        window.onerror = function (message, source, lineno, colno, error) { displayError(message, source, lineno, error); return true; };
+        window.addEventListener('unhandledrejection', function(event) { console.error('Unhandled Promise Rejection:', event.reason); const reason = event.reason; displayError(reason?.message || 'Unhandled Promise Rejection', reason?.fileName || 'Promise', reason?.lineNumber || 'N/A', reason); event.preventDefault(); });
+        if(closeErrorBtn) { closeErrorBtn.onclick = () => { if(errorDisplayDiv) errorDisplayDiv.style.display = 'none'; }; }
+        // *****************************************************************
 
-        // ========================= Predefined "Codable" Columns Data (Metadata Fields) =========================
-         // UPDATED based on user's JSON snippet
-         const predefinedColumnData = [
-            // Fields from JSON snippet (some make less sense as 'codable', included per request)
-            { name: "Title", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 100000 }, // Note: Also fixed column "Item Title"
-            { name: "Authors", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 200000 },
-            { name: "Year", included: false, type: 'number', options: [], hasLevel2: false, isPredefined: true, idBase: 300000 },
-            { name: "Abstract", included: false, type: 'textarea', options: [], hasLevel2: false, isPredefined: true, idBase: 400000 },
-            { name: "DOI", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 500000 },
-            { name: "Keywords", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 600000 },
-            { name: "URL", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 700000 }, // Note: Also fixed column
-            { name: "Publisher", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 800000 },
-            { name: "Institution", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 900000 },
-            { name: "Volume", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1000000 },
-            { name: "Pages", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1100000 },
-            { name: "Edition", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1200000 },
-            { name: "Issue", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1300000 },
-            { name: "Availability", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1400000 },
-            { name: "TypeName", included: false, type: 'dropdown', options: [], hasLevel2: false, isPredefined: true, idBase: 1500000 },
-            { name: "Month", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1600000 },
-            { name: "StandardNumber", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1700000 },
-            { name: "City", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1800000 },
-            { name: "Country", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 1900000 },
-            { name: "Comments", included: false, type: 'textarea', options: [], hasLevel2: false, isPredefined: true, idBase: 2000000 }, // Note: JSON field also used for text data
-            { name: "ItemStatus", included: false, type: 'dropdown', options: [], hasLevel2: false, isPredefined: true, idBase: 2100000 }, // e.g., Included, Excluded, Pending
-            // Fields normally derived/automatic - included as codable text per request:
-            { name: "ParentTitle", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2200000 },
-            { name: "ParentAuthors", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2300000 },
-            { name: "CreatedBy", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2400000 },
-            { name: "EditedBy", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2500000 },
-            { name: "DateCreated", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2600000 },
-            { name: "DateEdited", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2700000 },
-            { name: "ShortTitle", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2800000 },
-            { name: "OldItemId", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 2900000 },
-            { name: "ItemStatusTooltip", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 3000000 },
-            { name: "QuickCitation", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, idBase: 3100000 },
+        // ========================= Helper Functions (Unchanged) =========================
+        function showLoadingOverlay() { const el = document.getElementById('loadingOverlay'); if (el) el.style.display = 'flex'; }
+        function hideLoadingOverlay() { const el = document.getElementById('loadingOverlay'); if (el) el.style.display = 'none'; }
+        function validateNumRows(numRows) { if (isNaN(numRows) || numRows < 0) { alert("Number of rows must be zero or a positive number."); return false; } return true; } // Allow 0 for initial creation
+        function hashCode(str) { let hash = 0; if (!str || str.length === 0) return hash; for (let i = 0; i < str.length; i++) { const chr = str.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; } return Math.abs(hash || 1); }
+        function sanitizeForId(str) { if (!str) return ''; return str.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/^[^a-zA-Z_]+/, '').substring(0, 50) || 'col';}
+
+        // ========================= Predefined Columns Data =========================
+        const predefinedColumnData = [ // Still used for the UI setup
+            { name: "Authors", internalName: "Authors", nameDisplay: "Authors", included: false, type: 'text', options: [], hasLevel2: false, isPredefined: true, description: "List of authors (e.g., Smith J, Doe A)." },
+            { name: "Year", internalName: "Year", nameDisplay: "Year", included: false, type: 'number', options: [], hasLevel2: false, isPredefined: true, description: "Year of publication (numeric)." },
+            { name: "Country", internalName: "Country", nameDisplay: "Country", included: false, type: 'dropdown', options: [], hasLevel2: false, isPredefined: true, description: "Primary country of study focus." },
+            { name: "Study_Design", internalName: "Study_Design", nameDisplay: "Study Design", included: false, type: 'dropdown', options: [], hasLevel2: false, isPredefined: true, description: "Main research design used." },
+            { name: "SDG", internalName: "SDG", nameDisplay: "SDG", included: false, type: 'checkbox_group', options: [], hasLevel2: false, isPredefined: true, description: "Relevant Sustainable Development Goals." },
         ];
+        const LOCAL_STORAGE_KEY = 'eppiMapperTemplate_v_Combined_AddDelExport_MultiDrop'; // New key
 
+        // ========================= ID Generators (Simplified for Sample 1) =========================
+        let attributeIdCounter = 1; // Start simple, only need unique AttributeIds
+        let itemIdCounter = 1; // Start simple for unique ItemIds
+        let rowIdCounter = 1; // For internal row tracking
+
+        function generateAttributeId() { return attributeIdCounter++; }
+        function generateItemId() { return itemIdCounter++; }
+        function generateRowId() { return rowIdCounter++; }
+        // Removed generateSetId and generateAttributeSetId as they are not strictly needed for Sample 1 format
+        function resetIdCounters() { attributeIdCounter = 1; itemIdCounter = 1; rowIdCounter = 1; console.log("Minimal ID counters reset."); }
+        resetIdCounters(); // Reset on initial load
+
+        // Declare entryModule globally
+        let entryModule;
 
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOMContentLoaded fired!");
 
             // ========================= DOM ELEMENTS =========================
             const studyTitleInput = document.getElementById('studyTitle');
-            // REMOVED studyAuthorsInput, studyYearInput, studyAbstractTextarea refs
-
-            const predefinedColumnsTableBody = document.getElementById('predefinedColumnsTable')?.querySelector('tbody');
-
+            const predefinedColumnsTableBody = document.getElementById('predefinedColumnsTable')?.querySelector('tbody'); // Keep ref for setup
             const numRowsInput = document.getElementById('numRows');
-            const numColsSelect = document.getElementById('numCols');
-            const defineColumnsButton = document.getElementById('defineColumnsBtn');
+            const addDynamicColumnButton = document.getElementById('addDynamicColumnBtn');
             const columnDefinitionArea = document.getElementById('columnDefinitionArea');
             const columnDefinitionTable = document.getElementById('columnDefinitionTable');
-
-            const enterDataButton = document.getElementById('enterDataBtn');
+            const columnDefinitionTableBody = columnDefinitionTable?.querySelector('tbody');
+            const enterDataButtonInline = document.getElementById('enterDataBtnInline');
             const dataEntryArea = document.getElementById('dataEntryArea');
             const dataEntryTable = document.getElementById('dataEntryTable');
-            const pasteDataButton = document.getElementById('pasteDataBtn');
-            const pasteSuccessMessage = document.getElementById('pasteSuccessMessage');
-            const clearTableButton = document.getElementById('clearTableBtn');
-
+            const dataEntryTableHead = dataEntryTable?.querySelector('thead');
+            const dataEntryTableBody = dataEntryTable?.querySelector('tbody');
+            const pasteDataButtonInline = document.getElementById('pasteDataBtnInline');
+            const pasteSuccessMessageInline = document.getElementById('pasteSuccessMessageInline');
+            const clearTableButtonInline = document.getElementById('clearTableBtnInline');
             const diagramDisplay = document.getElementById('diagramDisplay');
-
+            const diagramContainer = document.getElementById('diagramContainer');
             const generatePart1JSONButton = document.getElementById('generatePart1JSON');
             const generatePart2JSONButton = document.getElementById('generatePart2JSON');
             const generateCombinedJSONButton = document.getElementById('generateCombinedJSON');
@@ -200,323 +312,277 @@
             const jsonDisplayDiv = document.getElementById('jsonDisplay');
             const jsonDisplayArea = document.getElementById('jsonDisplayArea');
             const downloadJSONButton = document.getElementById('downloadJSON');
+            const saveDataBtn = document.getElementById('saveDataBtn');
+            const loadDataBtn = document.getElementById('loadDataBtn');
+            const clearSavedDataBtn = document.getElementById('clearSavedDataBtn');
+            const localStorageStatus = document.getElementById('localStorageStatus');
+            const messageWindow = document.getElementById('messageWindow');
+            const closeMessageBtn = document.getElementById('closeMessageBtn');
+            const addDataRowButton = document.getElementById('addDataRowBtn');
+            const exportStateBtn = document.getElementById('exportStateBtn');
+            const importFileElement = document.getElementById('importFile');
+            const importStatusSpan = document.getElementById('importStatus');
 
+            // **** Checks for essential elements ****
+             if (!studyTitleInput) console.error("Init Error: studyTitleInput not found!"); if (!predefinedColumnsTableBody) console.error("Init Error: predefinedColumnsTableBody not found!"); if (!numRowsInput) console.error("Init Error: numRowsInput not found!"); if (!addDynamicColumnButton) console.error("Init Error: addDynamicColumnButton not found!"); if (!columnDefinitionArea) console.error("Init Error: columnDefinitionArea not found!"); if (!columnDefinitionTableBody) console.error("Init Error: columnDefinitionTableBody not found!"); if (!enterDataButtonInline) console.error("Init Error: enterDataButtonInline not found!"); if (!dataEntryArea) console.error("Init Error: dataEntryArea not found!"); if (!dataEntryTable) console.error("Init Error: dataEntryTable not found!"); if (!dataEntryTableHead) console.error("Init Error: dataEntryTable thead not found!"); if (!dataEntryTableBody) console.error("Init Error: dataEntryTable tbody not found!"); if (!pasteDataButtonInline) console.error("Init Error: pasteDataButtonInline not found!"); if (!clearTableButtonInline) console.error("Init Error: clearTableButtonInline not found!"); if (!diagramDisplay) console.error("Init Error: diagramDisplay not found!"); if (!diagramContainer) console.error("Init Error: diagramContainer not found!"); if (!generatePart1JSONButton) console.error("Init Error: generatePart1JSONButton not found!"); if (!generatePart2JSONButton) console.error("Init Error: generatePart2JSONButton not found!"); if (!generateCombinedJSONButton) console.error("Init Error: generateCombinedJSONButton not found!"); if (!jsonDisplayArea) console.error("Init Error: jsonDisplayArea not found!"); if (!jsonDisplayDiv) console.error("Init Error: jsonDisplayDiv not found!"); if (!downloadJSONButton) console.error("Init Error: downloadJSONButton not found!"); if (!saveDataBtn) console.error("Init Error: saveDataBtn not found!"); if (!loadDataBtn) console.error("Init Error: loadDataBtn not found!"); if (!clearSavedDataBtn) console.error("Init Error: clearSavedDataBtn not found!"); if (!localStorageStatus) console.error("Init Error: localStorageStatus not found!"); if (!addDataRowButton) console.error("Init Error: addDataRowBtn not found!"); if (!exportStateBtn) console.error("Init Error: exportStateBtn not found!"); if (!importFileElement) console.error("Init Error: importFile element not found!"); if (!importStatusSpan) console.error("Init Error: importStatusSpan not found!");
+// END OF CHUNK 2
 
             // ========================= MODULE DEFINITION =========================
-            const entryModule = (function() {
-                // --- ID Counters / Generators / Reset --- (Unchanged)
-                let rowIdCounter = 9000001; let dynamicColElementIdCounter = 1000;
-                let dropdownItemIdCounter = 100001; let setIdCounter = 21867;
-                function generateRowId() { return rowIdCounter++; }
-                function generateDynColElementId() { return dynamicColElementIdCounter++; }
-                function generateDropdownItemId() { return dropdownItemIdCounter++; }
-                function generateSetId() { return setIdCounter++; }
-                function resetIdCounters() { rowIdCounter = 9000001; dynamicColElementIdCounter = 1000; dropdownItemIdCounter = 100001; setIdCounter = 21867; }
+            entryModule = (function() {
 
-                // --- Dropdown UI Helpers --- (Unchanged - work for both predefined/dynamic)
-                 function createLevel2OptionsDiv(colIdentifier, parentLevel1OptionDiv, hasLevel2CheckboxRef) { /* ... as before ... */
-                    const level2OptionsDiv = document.createElement("div"); level2OptionsDiv.classList.add("dropdown-level2-options");
-                    level2OptionsDiv.style.display = hasLevel2CheckboxRef.checked ? "block" : "none";
-                    const addLevel2Button = document.createElement("button"); addLevel2Button.type = "button"; addLevel2Button.textContent = "Add Level 2 Option"; addLevel2Button.style.marginTop = "5px";
-                    addLevel2Button.addEventListener("click", function() {
-                        const level2InputContainer = document.createElement("div"); level2InputContainer.style.marginBottom = "3px"; level2InputContainer.style.display = "flex"; level2InputContainer.style.alignItems = "center";
-                        const level2Input = document.createElement("input"); level2Input.type = "text"; level2Input.dataset.colIdentifier = colIdentifier; level2Input.dataset.optionIndex = parentLevel1OptionDiv.dataset.optionIndex;
-                        level2Input.dataset.level2OptionIndex = level2OptionsDiv.querySelectorAll("input[data-level2-option-index]").length; level2Input.placeholder = "Level 2 Option";
-                        level2Input.dataset.dropdownItemId = generateDropdownItemId(); level2Input.style.flexGrow = "1"; level2Input.style.marginRight = "5px";
-                        const removeLevel2Button = document.createElement("button"); removeLevel2Button.type = "button"; removeLevel2Button.textContent = "Remove"; removeLevel2Button.addEventListener("click", function() { level2InputContainer.remove(); updateDiagramDisplay(); });
-                        level2InputContainer.appendChild(level2Input); level2InputContainer.appendChild(removeLevel2Button); level2OptionsDiv.insertBefore(level2InputContainer, addLevel2Button); level2Input.focus();
-                        level2Input.addEventListener('input', updateDiagramDisplay); level2Input.addEventListener('blur', updateDiagramDisplay);
-                    }); level2OptionsDiv.appendChild(addLevel2Button); return level2OptionsDiv;
-                 }
-                 function createDropdownOption(container, colIdentifier, hasLevel2CheckboxRef) { /* ... as before ... */
-                    const optionDiv = document.createElement("div"); optionDiv.classList.add("dropdown-option"); optionDiv.dataset.optionIndex = container.querySelectorAll(".dropdown-option").length;
-                    const level1InputContainer = document.createElement("div"); level1InputContainer.style.display = "flex"; level1InputContainer.style.alignItems = "center"; level1InputContainer.style.marginBottom = "5px";
-                    const input = document.createElement("input"); input.type = "text"; input.placeholder = "Level 1 Option"; input.dataset.colIdentifier = colIdentifier; input.dataset.optionIndex = optionDiv.dataset.optionIndex;
-                    input.dataset.dropdownItemId = generateDropdownItemId(); input.style.flexGrow = "1"; input.style.marginRight = "5px"; input.addEventListener('input', updateDiagramDisplay); input.addEventListener('blur', updateDiagramDisplay);
-                    level1InputContainer.appendChild(input);
-                    const removeButton = document.createElement('button'); removeButton.type = "button"; removeButton.textContent = 'Remove'; removeButton.addEventListener('click', function() { optionDiv.remove(); updateDiagramDisplay(); });
-                    level1InputContainer.appendChild(removeButton); optionDiv.appendChild(level1InputContainer);
-                    const level2Div = createLevel2OptionsDiv(colIdentifier, optionDiv, hasLevel2CheckboxRef); optionDiv.appendChild(level2Div); return optionDiv;
-                 }
-                 function populateDropdownOptionsUI(container, colIdentifier, hasLevel2CheckboxRef, diagramUpdateCallback) { /* ... as before ... */
-                    container.innerHTML = ''; const addButton = document.createElement('button'); addButton.type = "button"; addButton.textContent = 'Add Level 1 Option'; addButton.style.marginBottom = "10px";
-                    addButton.addEventListener('click', function() { if (!hasLevel2CheckboxRef || typeof hasLevel2CheckboxRef.checked === 'undefined') { console.error("Invalid L2 checkbox ref for col:", colIdentifier); hasLevel2CheckboxRef = {checked: false}; } const optionDiv = createDropdownOption(container, colIdentifier, hasLevel2CheckboxRef); container.appendChild(optionDiv); diagramUpdateCallback(); });
-                    container.appendChild(addButton);
-                 }
+                 // --- UI Helpers (Remove, Create Buttons, Create L2 Div) ---
+                 function handleRemoveOption(event) { const button = event.target; const optionDiv = button.closest('.dropdown-option, .checkbox-option'); if (optionDiv) { optionDiv.remove(); updateDiagramDisplay(); } else { console.warn("Could not find parent option div for remove button."); } }
+                 function createRemoveButton() { const removeButton = document.createElement('button'); removeButton.type = "button"; removeButton.textContent = '×'; removeButton.title = "Remove this option/label"; removeButton.classList.add('remove-option-button'); return removeButton; }
+                 function createLevel2OptionsDiv(colIdentifier, parentLevel1OptionDiv, hasLevel2) { const l2Container = document.createElement("div"); l2Container.classList.add("dropdown-level2-options"); l2Container.setAttribute('data-parent-col-identifier', colIdentifier); const addL2Button = document.createElement('button'); addL2Button.type = "button"; addL2Button.textContent = 'Add Level 2 Option'; addL2Button.classList.add('add-option-button'); addL2Button.style.marginTop = "5px"; l2Container.appendChild(addL2Button); parentLevel1OptionDiv.setAttribute('data-has-level2-container', 'true'); return l2Container; }
 
-                // --- Populate the DYNAMIC column definition table --- (Unchanged)
-                 function populateDynamicColumnDefinitionTable(numCols, diagramUpdateCallback) { /* ... as before ... */
-                    const tableBody = columnDefinitionTable.querySelector("tbody"); if (!tableBody) { console.error("Dynamic column definition table body not found!"); return; } tableBody.innerHTML = "";
-                    for (let i = 0; i < numCols; i++) {
-                        const row = tableBody.insertRow(); const columnId = generateDynColElementId();
-                        const titleCell = row.insertCell(); const titleInput = document.createElement("input"); titleInput.type = "text"; titleInput.placeholder = `Dynamic Column ${i + 1} Title`; titleInput.addEventListener('input', diagramUpdateCallback); titleCell.appendChild(titleInput);
-                        const typeCell = row.insertCell(); const typeSelect = document.createElement("select"); typeSelect.innerHTML = `<option value="text">Text</option><option value="dropdown">Dropdown</option>`; typeCell.appendChild(typeSelect);
-                        const hasLevel2Cell = row.insertCell(); const hasLevel2Checkbox = document.createElement("input"); hasLevel2Checkbox.type = "checkbox"; hasLevel2Checkbox.id = `dyn-l2-visible-${columnId}`; hasLevel2Checkbox.style.display = 'none'; hasLevel2Cell.appendChild(hasLevel2Checkbox);
-                        const hasLevel2HiddenCheckbox = document.createElement("input"); hasLevel2HiddenCheckbox.type = "checkbox"; hasLevel2HiddenCheckbox.id = `dyn-l2-hidden-${columnId}`; hasLevel2HiddenCheckbox.style.display = 'none'; hasLevel2Cell.appendChild(hasLevel2HiddenCheckbox);
-                        const dropdownOptionsCell = row.insertCell(); const dropdownOptionsContainer = document.createElement("div"); dropdownOptionsContainer.classList.add("dropdown-options-container"); dropdownOptionsCell.appendChild(dropdownOptionsContainer); dropdownOptionsCell.style.display = 'none';
-                        typeSelect.addEventListener("change", function() {
-                            const selectedType = typeSelect.value;
-                            if (selectedType === "dropdown") { dropdownOptionsCell.style.display = "block"; hasLevel2Cell.style.display = "table-cell"; hasLevel2Checkbox.style.display = 'inline-block'; hasLevel2Checkbox.checked = hasLevel2HiddenCheckbox.checked; populateDropdownOptionsUI(dropdownOptionsContainer, columnId, hasLevel2HiddenCheckbox, diagramUpdateCallback); }
-                            else { dropdownOptionsCell.style.display = "none"; hasLevel2Cell.style.display = "none"; hasLevel2Checkbox.style.display = 'none'; hasLevel2HiddenCheckbox.checked = false; dropdownOptionsContainer.innerHTML = ''; }
-                            diagramUpdateCallback();
-                        });
-                        hasLevel2Checkbox.addEventListener("change", function() {
-                            const hasLevel2 = hasLevel2Checkbox.checked; hasLevel2HiddenCheckbox.checked = hasLevel2; const level1Options = dropdownOptionsContainer.querySelectorAll(".dropdown-option");
-                            level1Options.forEach(level1OptionDiv => { const level2OptionsDiv = level1OptionDiv.querySelector(".dropdown-level2-options"); if (level2OptionsDiv) { level2OptionsDiv.style.display = hasLevel2 ? "block" : "none"; } });
-                            diagramUpdateCallback();
-                        });
+// END OF CHUNK 3
+
+                 // --- Create Dropdown Option (Stores ONLY AttributeId) ---
+                 function createDropdownOption(container, colIdentifier, hasLevel2Ref, isLevel2 = false, optionData = {}) { const optionText = typeof optionData === 'string' ? optionData : optionData.text || ''; const optAttributeId = optionData.attributeId || generateAttributeId(); const optionDiv = document.createElement('div'); optionDiv.classList.add('dropdown-option'); optionDiv.setAttribute('data-attribute-id', optAttributeId); optionDiv.setAttribute('data-col-identifier', colIdentifier); const textInput = document.createElement('input'); textInput.type = 'text'; textInput.placeholder = isLevel2 ? 'L2 Option' : 'L1 Option'; textInput.value = optionText; textInput.addEventListener('input', updateDiagramDisplay); const removeButton = createRemoveButton(); optionDiv.appendChild(textInput); optionDiv.appendChild(removeButton); if (!isLevel2 && hasLevel2Ref && hasLevel2Ref.checked) { const l2OptionsContainer = createLevel2OptionsDiv(colIdentifier, optionDiv, true); optionDiv.appendChild(l2OptionsContainer); if(optionData.level2Options && Array.isArray(optionData.level2Options)){ const addL2Button = l2OptionsContainer.querySelector('.add-option-button'); optionData.level2Options.forEach(l2OptData => { const l2OptionDiv = createDropdownOption(l2OptionsContainer, colIdentifier, null, true, l2OptData); if(addL2Button) l2OptionsContainer.insertBefore(l2OptionDiv, addL2Button); else l2OptionsContainer.appendChild(l2OptionDiv); }); } } return optionDiv; }
+                 // --- Create Checkbox Option (Stores ONLY AttributeId) ---
+                 function createCheckboxOption(container, colIdentifier, optionData = {}) { const optionText = typeof optionData === 'string' ? optionData : optionData.text || ''; const optAttributeId = optionData.attributeId || generateAttributeId(); const optionDiv = document.createElement('div'); optionDiv.classList.add('checkbox-option'); optionDiv.setAttribute('data-attribute-id', optAttributeId); optionDiv.setAttribute('data-col-identifier', colIdentifier); const textInput = document.createElement('input'); textInput.type = 'text'; textInput.placeholder = 'Checkbox Label'; textInput.value = optionText; const removeButton = createRemoveButton(); optionDiv.appendChild(textInput); optionDiv.appendChild(removeButton); return optionDiv; }
+                 // --- Populate Options UI ---
+                 function populateDropdownOptionsUI(optionsContainer, colIdentifier, hasLevel2CheckboxRef, optionsToLoad = []) { optionsContainer.innerHTML = ''; optionsContainer.className = 'dropdown-options-container'; (optionsToLoad || []).forEach(optData => { const level1OptionDiv = createDropdownOption(optionsContainer, colIdentifier, hasLevel2CheckboxRef, false, optData); optionsContainer.appendChild(level1OptionDiv); }); const addL1Button = document.createElement('button'); addL1Button.type = "button"; addL1Button.textContent = 'Add Level 1 Option'; addL1Button.classList.add('add-option-button'); optionsContainer.appendChild(addL1Button); }
+                 function populateCheckboxOptionsUI(optionsContainer, colIdentifier, optionsToLoad = []) { optionsContainer.innerHTML = ''; optionsContainer.className = 'checkbox-options-container'; (optionsToLoad || []).forEach(optData => { const optionDiv = createCheckboxOption(optionsContainer, colIdentifier, optData); optionsContainer.appendChild(optionDiv); }); const addButton = document.createElement('button'); addButton.type = "button"; addButton.textContent = 'Add Checkbox Label'; addButton.classList.add('add-option-button'); optionsContainer.appendChild(addButton); }
+
+                 // --- handleTypeChange (Handles both predefined and dynamic, including multi-dropdown) ---
+                 function handleTypeChange(selectElement) { const colIdentifier = selectElement.getAttribute('data-col-identifier'); if (!colIdentifier) { console.error("handleTypeChange: Missing data-col-identifier"); return; } const parentRow = selectElement.closest('tr'); if (!parentRow) { console.error("handleTypeChange: Could not find parent row"); return; } const isPredefined = parentRow.closest('table')?.id === 'predefinedColumnsTable'; const l2CellIndex = isPredefined ? 3 : 2; const optionsCellIndex = isPredefined ? 4 : 3; const l2Cell = parentRow.cells[l2CellIndex]; const optionsCell = parentRow.cells[optionsCellIndex]; if (!optionsCell) { console.error(`handleTypeChange: Could not find options cell (index ${optionsCellIndex})`); return; } const l2VisibleCheck = parentRow.querySelector(`input[type="checkbox"][id$="-l2-visible-${colIdentifier}"]`); const l2HiddenCheck = parentRow.querySelector(`input[type="checkbox"][id$="-l2-hidden-${colIdentifier}"]`); const l2Label = parentRow.querySelector(`label[for$="-l2-visible-${colIdentifier}"]`); const selectedType = selectElement.value; const isDropdown = (selectedType === 'dropdown' || selectedType === 'dropdown_multi'); const isCheckbox = (selectedType === 'checkbox_group' || selectedType === '0/1_per_option'); if (l2Cell) l2Cell.style.visibility = isDropdown ? "visible" : "hidden"; /* Only show L2 for dropdown types */ if (l2VisibleCheck) { l2VisibleCheck.style.display = isDropdown ? 'inline-block' : 'none'; if(isDropdown && l2HiddenCheck) l2VisibleCheck.checked = l2HiddenCheck.checked; else l2VisibleCheck.checked = false; } if (l2Label) l2Label.style.display = isDropdown ? 'inline-block' : 'none'; optionsCell.innerHTML = ''; if (isDropdown || isCheckbox) { optionsCell.style.display = ''; const optionsContainer = document.createElement("div"); optionsContainer.setAttribute('data-col-identifier', colIdentifier); optionsCell.appendChild(optionsContainer); if (isDropdown) populateDropdownOptionsUI(optionsContainer, colIdentifier, l2HiddenCheck || { checked: false }, []); else populateCheckboxOptionsUI(optionsContainer, colIdentifier, []); } else { optionsCell.style.display = 'none'; } updateDiagramDisplay(); }
+// END OF CHUNK 4
+
+                 // --- Add Dynamic Column Row (Includes multi-dropdown type) ---
+                 function addDynamicColumnRow(loadData = {}) {
+                    console.log("[addDynamicColumnRow] Function entered. Load data:", loadData);
+                    if (!columnDefinitionTableBody) { displayError("Cannot add column row: Dynamic table body not found."); return; }
+                    const colIdentifier = loadData.id || `dyn-${sanitizeForId(loadData.title || `col`)}_${Date.now() + Math.random()}`;
+                    const colAttributeId = loadData.colAttributeId || generateAttributeId(); // Column's own AttributeId
+
+                    try {
+                        const row = columnDefinitionTableBody.insertRow();
+                        row.setAttribute('data-col-identifier', colIdentifier);
+                        row.setAttribute('data-col-attribute-id', colAttributeId); // Store column's Attr ID needed for Part 1
+                        // Removed SetId and AttributeSetId attributes
+
+                        // Cell 0: Title
+                        const titleCell = row.insertCell(); const titleInput = document.createElement("input"); titleInput.type = "text"; titleInput.placeholder = `Column Title`; titleInput.value = loadData.title || ''; titleInput.setAttribute('data-col-identifier', colIdentifier); titleInput.addEventListener('input', updateDiagramDisplay); titleCell.appendChild(titleInput);
+                        // Cell 1: Type
+                        const typeCell = row.insertCell(); const typeSelect = document.createElement("select");
+                         const typeOptions = [ { value: "text", text: "Text" }, { value: "dropdown", text: "Dropdown (Single)" }, { value: "dropdown_multi", text: "Dropdown (Multi)" }, { value: "checkbox_group", text: "Checkbox Group" }, { value: "0/1_per_option", text: "Checkbox (0/1)" }, { value: "number", text: "Number" } ]; // Added multi dropdown
+                        typeOptions.forEach(optData => { const optionElement = document.createElement('option'); optionElement.value = optData.value; optionElement.textContent = optData.text; typeSelect.appendChild(optionElement); }); typeSelect.value = loadData.type || 'text'; typeSelect.setAttribute('data-col-identifier', colIdentifier); typeCell.appendChild(typeSelect);
+                        // Cell 2: L2 Checkbox
+                        const hasLevel2Cell = row.insertCell(); hasLevel2Cell.style.textAlign = 'center'; hasLevel2Cell.style.verticalAlign = 'middle'; const hasLevel2HiddenCheckbox = document.createElement("input"); hasLevel2HiddenCheckbox.type = "checkbox"; hasLevel2HiddenCheckbox.id = `dyn-l2-hidden-${colIdentifier}`; hasLevel2HiddenCheckbox.checked = loadData.hasLevel2 || false; hasLevel2HiddenCheckbox.style.display = 'none'; hasLevel2Cell.appendChild(hasLevel2HiddenCheckbox); const hasLevel2VisibleCheckbox = document.createElement("input"); hasLevel2VisibleCheckbox.type = "checkbox"; hasLevel2VisibleCheckbox.id = `dyn-l2-visible-${colIdentifier}`; hasLevel2VisibleCheckbox.style.display = 'none'; hasLevel2VisibleCheckbox.title = "Enable Level 2 options"; hasLevel2Cell.appendChild(hasLevel2VisibleCheckbox); const l2Label = document.createElement('label'); l2Label.htmlFor = hasLevel2VisibleCheckbox.id; l2Label.textContent = ' L2?'; l2Label.style.fontWeight = 'normal'; l2Label.style.display = 'none'; l2Label.title = "Enable Level 2 options"; hasLevel2Cell.appendChild(l2Label);
+                        // Cell 3: Options Definition
+                        const optionsCell = row.insertCell(); optionsCell.style.verticalAlign = 'top'; const optionsContainerPlaceholder = document.createElement("div"); optionsContainerPlaceholder.classList.add("options-container-placeholder"); optionsContainerPlaceholder.setAttribute('data-col-identifier', colIdentifier); optionsCell.appendChild(optionsContainerPlaceholder);
+                        // Cell 4: Delete Button
+                        const deleteCell = row.insertCell(); deleteCell.style.textAlign = 'center'; deleteCell.style.verticalAlign = 'middle'; const deleteButton = document.createElement('button'); deleteButton.textContent = '×'; deleteButton.title = 'Delete this column'; deleteButton.classList.add('delete-column-button'); deleteButton.type = 'button'; deleteButton.onclick = function() { if (confirm(`Delete column "${titleInput.value || '(Untitled)'}"? This cannot be undone.`)) { row.remove(); updateDiagramDisplay(); handleCreateTableClick(); } }; deleteCell.appendChild(deleteButton);
+
+                        // Event Listeners
+                        typeSelect.addEventListener("change", function() { handleTypeChange(this); });
+                        hasLevel2VisibleCheckbox.addEventListener("change", function() { if (typeSelect.value === 'dropdown' || typeSelect.value === 'dropdown_multi') { hasLevel2HiddenCheckbox.checked = this.checked; const currentOptionsContainer = optionsCell.querySelector('.dropdown-options-container'); if (currentOptionsContainer) { const currentOptions = entryModule.getOptionsFromUI(currentOptionsContainer); populateDropdownOptionsUI(currentOptionsContainer, colIdentifier, hasLevel2HiddenCheckbox, currentOptions); } updateDiagramDisplay(); } });
+
+                        // Initial setup call & load options
+                        handleTypeChange(typeSelect);
+                        if ((loadData.type === 'dropdown' || loadData.type === 'dropdown_multi' || loadData.type === 'checkbox_group' || loadData.type === '0/1_per_option') && loadData.options) { const currentOptionsContainer = optionsCell.querySelector('.dropdown-options-container, .checkbox-options-container'); if (currentOptionsContainer) { if (loadData.type.startsWith('dropdown')) populateDropdownOptionsUI(currentOptionsContainer, colIdentifier, hasLevel2HiddenCheckbox, loadData.options); else populateCheckboxOptionsUI(currentOptionsContainer, colIdentifier, loadData.options); } }
+
+                        if (columnDefinitionArea) columnDefinitionArea.style.display = 'block';
+                        updateDiagramDisplay();
+                    } catch(rowError) {
+                        console.error(`Error creating dynamic row:`, rowError);
+                        displayError(rowError.message, `addDynamicColumnRow`, 0, rowError);
                     }
-                 }
+                 } // End addDynamicColumnRow
 
-                 // --- Get ALL Codable Column Definitions (Predefined Included + Dynamic) --- (Unchanged)
-                 function getAllCodableColumnDefinitions() { /* ... as before ... */
-                    const allDefs = [];
-                    predefinedColumnData.forEach((colData, index) => {
-                        const includeCheckbox = document.getElementById(`predef-inc-${index}`);
-                        if (includeCheckbox && includeCheckbox.checked) {
-                            const typeSelect = document.getElementById(`predef-type-${index}`); const currentType = typeSelect ? typeSelect.value : 'text';
-                            const hasL2VisibleCheck = document.getElementById(`predef-l2-visible-${index}`); const currentHasL2 = hasL2VisibleCheck ? hasL2VisibleCheck.checked : false;
-                            const definition = { title: colData.name, type: currentType, hasLevel2: currentHasL2, options: [], isPredefined: true, predefinedIndex: index };
-                            if (definition.type === 'dropdown') {
-                                const optionsContainer = document.getElementById(`predef-options-${index}`)?.querySelector('.dropdown-options-container');
-                                if (optionsContainer) {
-                                    const level1OptionDivs = optionsContainer.querySelectorAll(".dropdown-option");
-                                    level1OptionDivs.forEach((level1Div) => { const level1Input = level1Div.querySelector("input[data-option-index]"); if (level1Input && level1Input.value.trim()) { const level1Name = level1Input.value.trim(); let level1Id = parseInt(level1Input.dataset.dropdownItemId); if (isNaN(level1Id)) { console.warn(`Missing L1 ID`); level1Id = generateDropdownItemId(); level1Input.dataset.dropdownItemId = level1Id; } const level2Options = []; if (definition.hasLevel2) { const level2Div = level1Div.querySelector(".dropdown-level2-options"); if (level2Div) { const level2Inputs = level2Div.querySelectorAll("input[data-level2-option-index]"); level2Inputs.forEach(level2Input => { if (level2Input.value.trim()){ const level2Name = level2Input.value.trim(); let level2Id = parseInt(level2Input.dataset.dropdownItemId); if (isNaN(level2Id)) { console.warn(`Missing L2 ID`); level2Id = generateDropdownItemId(); level2Input.dataset.dropdownItemId = level2Id; } level2Options.push({ id: level2Id, name: level2Name }); } }); } } definition.options.push({ id: level1Id, name: level1Name, level2Options: level2Options }); } }); }
-                            } allDefs.push(definition);
-                        }
-                    });
-                    const dynamicTableBody = columnDefinitionTable.querySelector("tbody");
-                    if (dynamicTableBody) {
-                        const dynamicRows = dynamicTableBody.querySelectorAll("tr");
-                        dynamicRows.forEach((row, dynIndex) => {
-                            const titleInput = row.querySelector("td:nth-child(1) input"); const typeSelect = row.querySelector("td:nth-child(2) select"); const hasLevel2VisibleCheckbox = row.querySelector("td:nth-child(3) input[type='checkbox']:not([style*='none'])"); const dropdownContainer = row.querySelector(".dropdown-options-container"); const definition = { title: titleInput?.value || `Dynamic ${dynIndex + 1}`, type: typeSelect?.value || 'text', hasLevel2: hasLevel2VisibleCheckbox ? hasLevel2VisibleCheckbox.checked : false, options: [], isPredefined: false };
-                            if (definition.type === 'dropdown' && dropdownContainer) { const level1OptionDivs = dropdownContainer.querySelectorAll(".dropdown-option"); level1OptionDivs.forEach((level1Div) => { const level1Input = level1Div.querySelector("input[data-option-index]"); if (level1Input && level1Input.value.trim()) { const level1Name = level1Input.value.trim(); let level1Id = parseInt(level1Input.dataset.dropdownItemId); if (isNaN(level1Id)) { console.warn(`Missing L1 ID`); level1Id = generateDropdownItemId(); level1Input.dataset.dropdownItemId = level1Id; } const level2Options = []; if (definition.hasLevel2) { const level2Div = level1Div.querySelector(".dropdown-level2-options"); if (level2Div) { const level2Inputs = level2Div.querySelectorAll("input[data-level2-option-index]"); level2Inputs.forEach(level2Input => { if (level2Input.value.trim()){ const level2Name = level2Input.value.trim(); let level2Id = parseInt(level2Input.dataset.dropdownItemId); if (isNaN(level2Id)) { console.warn(`Missing L2 ID`); level2Id = generateDropdownItemId(); level2Input.dataset.dropdownItemId = level2Id; } level2Options.push({ id: level2Id, name: level2Name }); } }); } } definition.options.push({ id: level1Id, name: level1Name, level2Options: level2Options }); } }); } allDefs.push(definition);
-                        });
-                    } return allDefs;
-                 }
+                 // --- populateDynamicColumnDefinitionTable (Calls addDynamicColumnRow for loading) ---
+                 function populateDynamicColumnDefinitionTable(numColsIgnored, definitionsToLoad = []) { if (!columnDefinitionTableBody) { displayError("Table body for dynamic columns not found.", "populateDynamicColumnDefinitionTable"); return; } columnDefinitionTableBody.innerHTML = ""; columnDefinitionArea.style.display = 'block'; if (definitionsToLoad && definitionsToLoad.length > 0) { definitionsToLoad.forEach(defData => addDynamicColumnRow(defData)); } updateDiagramDisplay(); }
 
-                // --- Populate Data Entry Table (3 fixed cols + ALL codable cols + L1 disable logic) --- (Unchanged)
-                function populateDataEntryTable(numRows) { /* ... as before ... */
-                    const allCodableDefinitions = getAllCodableColumnDefinitions(); const dataEntryTable = document.getElementById('dataEntryTable'); dataEntryTable.innerHTML = '';
-                    const thead = document.createElement('thead'); const headerRow = thead.insertRow(); const initialFixedHeaders = ["Item", "Item Title", "URL"];
-                    initialFixedHeaders.forEach(txt => { headerRow.insertCell().textContent = txt; }); allCodableDefinitions.forEach(col => { headerRow.insertCell().textContent = col.title; }); dataEntryTable.appendChild(thead);
-                    const tbody = document.createElement('tbody');
-                    for (let i = 0; i < numRows; i++) {
-                        const row = tbody.insertRow(); row.insertCell().appendChild(document.createElement('input')).type = 'text'; row.insertCell().appendChild(document.createElement('input')).type = 'text'; row.insertCell().appendChild(document.createElement('input')).type = 'text';
-                        allCodableDefinitions.forEach(col => { const cell = row.insertCell(); if (col.type === 'text' || col.type === 'number' || col.type === 'textarea') { let inputElement; if (col.type === 'textarea'){ inputElement = document.createElement('textarea'); } else { inputElement = document.createElement('input'); inputElement.type = col.type === 'number' ? 'number' : 'text'; } cell.appendChild(inputElement); }
-                            else if (col.type === 'dropdown') { const select = document.createElement('select'); const defaultOpt = document.createElement('option'); defaultOpt.value = ""; defaultOpt.text = "-- Select --"; select.appendChild(defaultOpt); if (col.options && col.options.length > 0) { col.options.forEach(option => { const opt = document.createElement('option'); opt.value = option.id; opt.text = option.name; const hasL2Children = col.hasLevel2 && option.level2Options && option.level2Options.length > 0; if (hasL2Children) { opt.disabled = true; } select.appendChild(opt); if (hasL2Children) { option.level2Options.forEach(level2Option => { const opt2 = document.createElement('option'); opt2.value = level2Option.id; opt2.text = '\u00A0\u00A0' + level2Option.name; select.appendChild(opt2); }); } }); } cell.appendChild(select); } });
-                    } dataEntryTable.appendChild(tbody);
-                }
+                 // --- Get Options/Labels from UI (Unchanged) ---
+                 function getOptionsFromUI(optionsContainer) { if (!optionsContainer) { console.warn("getOptionsFromUI: optionsContainer is null"); return []; } const options = []; try { if (optionsContainer.classList.contains('dropdown-options-container')) { optionsContainer.querySelectorAll(':scope > .dropdown-option').forEach(l1OptDiv => { const textInput = l1OptDiv.querySelector(':scope > input[type="text"]'); const attributeId = parseInt(l1OptDiv.getAttribute('data-attribute-id')); if (textInput && textInput.value.trim() && !isNaN(attributeId)) { const optionData = { text: textInput.value.trim(), attributeId: attributeId, level2Options: [] }; const l2Container = l1OptDiv.querySelector('.dropdown-level2-options'); if (l2Container) { l2Container.querySelectorAll('.dropdown-option').forEach(l2OptDiv => { const l2TextInput = l2OptDiv.querySelector('input[type="text"]'); const l2AttributeId = parseInt(l2OptDiv.getAttribute('data-attribute-id')); if (l2TextInput && l2TextInput.value.trim() && !isNaN(l2AttributeId)) { optionData.level2Options.push({ text: l2TextInput.value.trim(), attributeId: l2AttributeId }); } else { console.warn("Skipping L2 option due to missing text or invalid ID:", l2TextInput?.value, l2AttributeId); } }); } options.push(optionData); } else { console.warn("Skipping L1 option due to missing text or invalid ID:", textInput?.value, attributeId); } }); } else if (optionsContainer.classList.contains('checkbox-options-container')) { optionsContainer.querySelectorAll('.checkbox-option').forEach(optDiv => { const textInput = optDiv.querySelector('input[type="text"]'); const attributeId = parseInt(optDiv.getAttribute('data-attribute-id')); if (textInput && textInput.value.trim() && !isNaN(attributeId)) { options.push({ text: textInput.value.trim(), attributeId: attributeId }); } else { console.warn("Skipping Checkbox option due to missing text or invalid ID:", textInput?.value, attributeId); } }); } } catch (e) { console.error("Error in getOptionsFromUI:", e); displayError("Error reading options from UI", "getOptionsFromUI", 0, e); } return options; }
 
-                // --- Generate Part 1 JSON (Defines Included 'Dropdown' Columns as CodeSets) --- MODIFIED
-                 function generatePart1Json() {
-                    try {
-                        const setName = document.getElementById(`studyTitle`).value.trim() || "EPPI Mapper Data";
-                        const allCodableDefinitions = getAllCodableColumnDefinitions();
-                        resetIdCounters(); // Reset for predictable Set IDs
+                 // --- Get ALL Codable Column Definitions (Combines Predefined + Dynamic - Handles new types) ---
+                 function getAllCodableColumnDefinitions() { console.log("--- Starting getAllCodableColumnDefinitions (Combined) ---"); const definitions = []; function processRowDefinition(row, isPredefined) { const predefinedIndex = isPredefined ? row.rowIndex : -1; const rowType = isPredefined ? `Predefined (Index ${predefinedIndex})` : `Dynamic (Row ${row.rowIndex})`; try { const includeCheckbox = isPredefined ? row.querySelector('input[type="checkbox"]') : { checked: true }; const titleElem = isPredefined ? row.cells[1] : row.querySelector('input[type="text"]'); const typeSelect = row.querySelector('select'); const optionsCellIndex = isPredefined ? 4 : 3; const optionsCell = row.cells[optionsCellIndex]; const hiddenL2Check = row.querySelector(`input[type="checkbox"][id*="-l2-hidden-"]`); const colIdentifier = row.getAttribute('data-col-identifier'); const colAttributeId = parseInt(row.getAttribute('data-col-attribute-id')); const shouldInclude = includeCheckbox?.checked; const title = isPredefined ? titleElem?.textContent?.trim() : titleElem?.value.trim(); const currentType = typeSelect?.value; if (shouldInclude && title && currentType && colIdentifier && !isNaN(colAttributeId)) { const def = { id: colIdentifier, title: title, internalName: isPredefined ? predefinedColumnData[predefinedIndex]?.internalName : title, type: currentType, isPredefined: isPredefined, hasLevel2: ((currentType === 'dropdown' || currentType === 'dropdown_multi') && hiddenL2Check && hiddenL2Check.checked) || false, options: [], description: isPredefined ? predefinedColumnData[predefinedIndex]?.description : '', colAttributeId: colAttributeId, };
+                     if (def.type === 'dropdown' || def.type === 'dropdown_multi' || def.type === 'checkbox_group' || def.type === '0/1_per_option') {
+                          const optionsContainer = optionsCell?.querySelector('.dropdown-options-container, .checkbox-options-container'); def.options = getOptionsFromUI(optionsContainer); }
+                     definitions.push(def); } else { /* console.warn(`  > Skipping row ${rowType}: Missing required data or 'Include?' not checked.`); */ } } catch (error) { console.error(`Error processing row ${rowType}:`, error); displayError(`Failed to process column definition for ${title || 'unknown'}`, `getAllCodableColumnDefinitions (${rowType})`, 0, error); } } if (predefinedColumnsTableBody) { Array.from(predefinedColumnsTableBody.rows).forEach(row => processRowDefinition(row, true)); } if (columnDefinitionTableBody) { Array.from(columnDefinitionTableBody.rows).forEach(row => processRowDefinition(row, false)); } console.log("--- Finished getAllCodableColumnDefinitions (Combined). Final Definitions Count: ---", definitions.length); return definitions; }
 
-                        const attributesList = []; // Initialize empty list
+                 // --- populateDataEntryTable (Handles ALL Types Display) ---
+                 function populateDataEntryTable(numRows, allColDefinitions, tableData = null) { if (!dataEntryTableHead || !dataEntryTableBody) { displayError("Data entry table Head or Body not found.", "populateDataEntryTable"); return; } if (!validateNumRows(numRows)) return; dataEntryTableHead.innerHTML = ''; dataEntryTableBody.innerHTML = ''; const headerRow1 = dataEntryTableHead.insertRow(); const headerRow2 = dataEntryTableHead.insertRow(); ['Item #', 'Item Title', 'URL', 'Abstract'].forEach(text => { const th = document.createElement('th'); th.textContent = text; th.rowSpan = 2; if(text === 'Item #') th.classList.add('col-item-num'); if(text === 'Item Title') th.classList.add('col-item-title'); if(text === 'URL') th.classList.add('col-item-url'); if(text === 'Abstract') th.classList.add('col-item-abstract'); headerRow1.appendChild(th); }); allColDefinitions.forEach(colDef => { const th = document.createElement('th'); th.textContent = colDef.title; th.setAttribute('data-col-identifier', colDef.id); th.title = colDef.description || colDef.title; if (colDef.type === '0/1_per_option' && colDef.options && colDef.options.length > 0) { th.colSpan = colDef.options.length; th.classList.add('col-codable-group'); colDef.options.forEach(opt => { const thSub = document.createElement('th'); thSub.textContent = opt.text; thSub.title = `${colDef.title} - ${opt.text}`; thSub.classList.add('col-checkbox-option'); headerRow2.appendChild(thSub); }); } else { th.rowSpan = 2; } headerRow1.appendChild(th); }); const thDel = document.createElement('th'); thDel.textContent = "Delete"; thDel.rowSpan = 2; thDel.classList.add('col-delete'); headerRow1.appendChild(thDel); for (let i = 0; i < numRows; i++) addDataEntryRow(i + 1, allColDefinitions, tableData ? tableData[i] : null); dataEntryArea.style.display = 'block'; dataEntryTable.style.tableLayout = 'auto'; }
 
-                        allCodableDefinitions.forEach((col) => {
-                             // ONLY include dropdowns in Part 1
-                            if (col.type === 'dropdown') {
-                                const attributeSetId = generateSetId();
-                                const attribute = { "AttributeId": attributeSetId, "AttributeName": col.title, "Attributes": { "AttributesList": [] } };
-                                if (col.options) {
-                                    col.options.forEach(level1Option => {
-                                        attribute.Attributes.AttributesList.push({ "AttributeId": level1Option.id, "AttributeName": level1Option.name });
-                                        if (col.hasLevel2 && level1Option.level2Options) {
-                                            level1Option.level2Options.forEach(level2Option => {
-                                                attribute.Attributes.AttributesList.push({ "AttributeId": level2Option.id, "AttributeName": level2Option.name });
-                                            });
-                                        }
-                                    });
-                                }
-                                attributesList.push(attribute); // Add dropdown attribute set to the list
-                            }
-                        });
-                        const codeSet = { "SetName": setName, "Attributes": { "AttributesList": attributesList } };
-                        return codeSet;
-                    } catch (error) { alert(`Error generating Part 1 JSON: ${error.message}`); console.error("Error generating Part 1 JSON:", error); return null; }
-                 } // End generatePart1Json (Modified)
+                 // --- addDataEntryRow (Handles ALL types UI including Multi-Dropdown) ---
+                 function addDataEntryRow(rowIndex, allColDefinitions, rowData = null) { if (!dataEntryTableBody) return; const row = dataEntryTableBody.insertRow(); const uniqueRowId = rowData?.rowInternalId || `dataRow-${generateRowId()}`; row.id = uniqueRowId; row.setAttribute('data-row-index', rowIndex); const itemCell = row.insertCell(); itemCell.textContent = rowIndex; const titleCell = row.insertCell(); const titleInput = document.createElement('input'); titleInput.type = 'text'; titleInput.placeholder = `Item ${rowIndex} Title`; titleInput.value = rowData?.itemTitle || ''; titleInput.setAttribute('data-field', 'itemTitle'); titleCell.appendChild(titleInput); const urlCell = row.insertCell(); const urlInput = document.createElement('input'); urlInput.type = 'text'; urlInput.placeholder = `Item ${rowIndex} URL`; urlInput.value = rowData?.itemURL || ''; urlInput.setAttribute('data-field', 'itemURL'); urlCell.appendChild(urlInput); const abstractCell = row.insertCell(); const abstractTextarea = document.createElement('textarea'); abstractTextarea.placeholder = `Item ${rowIndex} Abstract`; abstractTextarea.value = rowData?.itemAbstract || ''; abstractTextarea.setAttribute('data-field', 'itemAbstract'); abstractCell.appendChild(abstractTextarea);
+                     allColDefinitions.forEach(colDef => { const savedColumnData = rowData?.codedData ? rowData.codedData[colDef.id] : undefined;
+                         if (colDef.type === '0/1_per_option') { const savedSelections = (typeof savedColumnData === 'object' && savedColumnData !== null) ? savedColumnData : {}; (colDef.options || []).forEach(opt => { const optCell = row.insertCell(); optCell.classList.add('checkbox-option-cell'); optCell.setAttribute('data-col-identifier', colDef.id); optCell.setAttribute('data-option-label', opt.text); const select = document.createElement('select'); select.setAttribute('data-label', opt.text); select.setAttribute('data-attribute-id', opt.attributeId || ''); select.appendChild(new Option('0', '0')); select.appendChild(new Option('1', '1')); select.value = savedSelections[opt.text] === 1 ? '1' : '0'; optCell.appendChild(select); });
+                         } else { const cell = row.insertCell(); cell.setAttribute('data-col-identifier', colDef.id); switch (colDef.type) {
+                                case 'text': { const el = document.createElement('textarea'); el.value = savedColumnData || ''; cell.appendChild(el); break; }
+                                case 'number': { const el = document.createElement('input'); el.type = 'number'; el.step = "any"; el.value = savedColumnData || ''; cell.appendChild(el); break; }
+                                case 'dropdown': case 'dropdown_multi': { const el = document.createElement('select'); cell.appendChild(el); if (colDef.type === 'dropdown') { el.appendChild(new Option('- Select -', '')); } else { el.multiple = true; el.style.height = '5em'; } (colDef.options || []).forEach(opt => { if (colDef.hasLevel2 && opt.level2Options && opt.level2Options.length > 0) { const optGroup = document.createElement('optgroup'); optGroup.label = opt.text; opt.level2Options.forEach(l2Opt => optGroup.appendChild(new Option(`↳ ${l2Opt.text}`, l2Opt.text))); el.appendChild(optGroup); } else { el.appendChild(new Option(opt.text, opt.text)); } }); if (colDef.type === 'dropdown_multi') { const selectedValues = Array.isArray(savedColumnData) ? savedColumnData : []; Array.from(el.options).forEach(option => { if(selectedValues.includes(option.value)) option.selected = true; }); } else { el.value = savedColumnData || ""; } break; }
+                                case 'checkbox_group': { const groupDiv = document.createElement('div'); groupDiv.classList.add('checkbox-group-cell'); cell.appendChild(groupDiv); const selectedValues = Array.isArray(savedColumnData) ? savedColumnData : []; (colDef.options || []).forEach((opt, idx) => { const checkId = `${colDef.id}-${uniqueRowId}-opt${idx}`; const checkDiv = document.createElement('div'); const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.id = checkId; checkbox.value = opt.text; checkbox.checked = selectedValues.includes(opt.text); const label = document.createElement('label'); label.htmlFor = checkId; label.textContent = ` ${opt.text}`; label.style.fontWeight = 'normal'; checkDiv.appendChild(checkbox); checkDiv.appendChild(label); groupDiv.appendChild(checkDiv); }); break; }
+                                default: cell.textContent = `Unknown Type: ${colDef.type}`; } } });
+                     const deleteActionCell = row.insertCell(); deleteActionCell.style.textAlign = 'center'; const deleteRowButton = document.createElement('button'); deleteRowButton.textContent = '×'; deleteRowButton.title = 'Delete this row'; deleteRowButton.classList.add('delete-row-button'); deleteRowButton.type = 'button'; deleteRowButton.onclick = function() { if (confirm(`Delete row ${rowIndex}?`)) { row.remove(); } }; deleteActionCell.appendChild(deleteRowButton);
+                 } // End addDataEntryRow
+
+// END OF CHUNK 5
 
 
-                // --- Generate Part 2 JSON (References - Populates Codes array based on ALL included columns) --- MODIFIED
-                 function generatePart2Json() {
-                    try {
-                        const studyTitle = document.getElementById(`studyTitle`).value.trim() || "Untitled Study"; // Used for ParentTitle
-                        // REMOVED reading of studyAuthors, studyYear, studyAbstract from top section
+                 // --- Generate Part 1 JSON (CodeSets) - STRICTLY Sample 1 Format ---
+                 function generatePart1Json(allColDefinitions) {
+                    console.log("--- Starting generatePart1Json (Sample 1 Minimal Format) ---");
+                    const mainCodeSet = { SetName: studyTitleInput.value || "Mapping Tool", Attributes: { AttributesList: [] } };
+                    allColDefinitions.forEach(colDef => {
+                        // Process dropdown, dropdown_multi, checkbox_group, and 0/1_per_option
+                        if (colDef.type === 'dropdown' || colDef.type === 'dropdown_multi' || colDef.type === 'checkbox_group' || colDef.type === '0/1_per_option') {
+                            if (isNaN(colDef.colAttributeId)) { console.error(`  > ERROR: Missing AttributeId for column "${colDef.title}". Skipping.`); return; }
+                            const columnAttribute = { AttributeId: colDef.colAttributeId, AttributeName: colDef.title, Attributes: { AttributesList: [] } };
+                            (colDef.options || []).forEach(opt => {
+                                if (isNaN(opt.attributeId)) { console.error(`    > ERROR: Option "${opt.text}" has invalid AttributeID. Skipping.`); return; }
+                                // L2 Handling only applies to dropdown types
+                                if ((colDef.type === 'dropdown' || colDef.type === 'dropdown_multi') && colDef.hasLevel2 && opt.level2Options && opt.level2Options.length > 0) {
+                                    const l1GroupAttribute = { AttributeId: opt.attributeId, AttributeName: opt.text, Attributes: { AttributesList: [] } };
+                                    opt.level2Options.forEach(l2Opt => { if (isNaN(l2Opt.attributeId)) { console.error(`      > ERROR: L2 Option "${l2Opt.text}" has invalid AttributeID. Skipping L2.`); return; } l1GroupAttribute.Attributes.AttributesList.push({ AttributeId: l2Opt.attributeId, AttributeName: l2Opt.text }); });
+                                    columnAttribute.Attributes.AttributesList.push(l1GroupAttribute);
+                                } else { // Simple option for all relevant types
+                                     columnAttribute.Attributes.AttributesList.push({ AttributeId: opt.attributeId, AttributeName: opt.text });
+                                } });
+                            mainCodeSet.Attributes.AttributesList.push(columnAttribute);
+                        } else { console.log(`  > Skipping CodeSet entry for type: ${colDef.type}`); } });
+                    console.log("--- Finished generatePart1Json (Sample 1 Minimal Format) ---");
+                    return { CodeSets: mainCodeSet.Attributes.AttributesList.length > 0 ? [mainCodeSet] : [] };
+                 } // End generatePart1Json
 
-                        const allCodableDefinitions = getAllCodableColumnDefinitions();
-                        const dataEntryTable = document.getElementById('dataEntryTable'); const tableBody = dataEntryTable?.querySelector('tbody');
-                        if (!tableBody) { console.warn("Data entry table body not found for Part 2 JSON."); return []; }
-                        const references = []; const tableRows = Array.from(tableBody.querySelectorAll('tr'));
-                        rowIdCounter = 9000001; // Reset row ID
-                        const initialFixedCount = 3; const codableStartCellIndex = initialFixedCount;
 
-                        tableRows.forEach((row, rowIndex) => {
-                            try {
-                                const cells = row.cells; if (cells.length < codableStartCellIndex) { console.warn(`Skipping malformed row ${rowIndex + 1}`); return; }
-                                const itemInputValue = cells[0]?.querySelector('input')?.value || "";
-                                const titleInputValue = cells[1]?.querySelector('input')?.value || `Item ${rowIndex + 1}`;
-                                const urlInputValue = cells[2]?.querySelector('input')?.value || "";
-                                const generatedItemId = generateRowId();
+                 // --- Generate Part 2 JSON (References) - Handles All Types ---
+                 function generatePart2Json(allColDefinitions, numRowsIgnored) {
+                     console.log("--- Starting generatePart2Json (Handles All Types) ---");
+                     const referencesOutput = []; const studyTitle = studyTitleInput ? studyTitleInput.value.trim() : "";
+                     if (!dataEntryTableBody) { displayError("Data entry table Body not found.", "generatePart2Json"); return { References: [] }; }
+                     const dataRows = dataEntryTableBody.querySelectorAll('tr');
 
-                                // Create Reference Object - Metadata uses placeholders or is blank, as inputs were removed
-                                const reference = {
-                                    "Codes": [], "Outcomes": [], "ItemId": generatedItemId,
-                                    "Title": titleInputValue,
-                                    "Authors": "", // No study default, rely on coding if 'Authors' column included
-                                    "Year": "", // No study default, rely on coding if 'Year' included
-                                    "Abstract": "", // No study default, rely on coding if 'Abstract' included
-                                    "DOI": "", "Keywords": "", "URL": urlInputValue,
-                                    "ParentTitle": studyTitle, // Use overall study title
-                                    "ParentAuthors": "", // No study authors defined
-                                    "CreatedBy": "User", // Placeholder
-                                    "EditedBy": "User", // Placeholder
-                                    "DateCreated": new Date().toISOString(), "DateEdited": new Date().toISOString(),
-                                    "ShortTitle": titleInputValue.substring(0, 50), "Month": "", "StandardNumber": "", "City": "", "Country": "", "Publisher": "",
-                                    "Institution": "", "Volume": "", "Pages": "", "Edition": "", "Issue": "",
-                                    "Availability": "", "OldItemId": "", "Comments": `Item field value: ${itemInputValue}`,
-                                    "TypeName": "Journal Article", // Default - could be coded if 'TypeName' included
-                                    "ItemStatus": "I", "ItemStatusTooltip": "Included in review",
-                                    "QuickCitation": `(${titleInputValue})` // Simplified citation without author/year defaults
-                                };
+                     dataRows.forEach((row, index) => {
+                         const rowIndex = index + 1; console.log(`Processing References for Row ${rowIndex}`);
+                         const itemTitleInput = row.querySelector('input[data-field="itemTitle"]'); const itemUrlInput = row.querySelector('input[data-field="itemURL"]'); const itemAbstractTextarea = row.querySelector('textarea[data-field="itemAbstract"]'); const currentItemId = generateItemId();
+                         const reference = { Outcomes: [], ItemId: currentItemId, Title: itemTitleInput ? itemTitleInput.value.trim() : `Item ${rowIndex}`, ParentTitle: studyTitle, ShortTitle: "", DateCreated: new Date().toLocaleDateString('en-GB').replace(/\//g, '/'), CreatedBy: "Tool User", DateEdited: "", EditedBy: "", Year: "", Month: "", StandardNumber: "", City: "", Country: "", Publisher: "", Institution: "", Volume: "", Pages: "", Edition: "", Issue: "", Availability: "", URL: itemUrlInput ? itemUrlInput.value.trim() : "", OldItemId: "", Abstract: itemAbstractTextarea ? itemAbstractTextarea.value.trim() : "", Comments: "", TypeName: "", Authors: "", ParentAuthors: "", DOI: "", Keywords: "", ItemStatus: "", ItemStatusTooltip: "", QuickCitation: "", Codes: [] };
+                         let codedAttributeIds = {}; let keywordList = [];
 
-                                // Process ALL included codable columns -> Populates Codes array or Comments
-                                allCodableDefinitions.forEach((col, defIndex) => {
-                                    const cellIndex = codableStartCellIndex + defIndex; const cell = cells[cellIndex]; if (!cell) return;
-                                    try {
-                                        if (col.type === 'dropdown') {
-                                            const select = cell.querySelector('select');
-                                            if (select && select.value) { const selectedOptionId = parseInt(select.value); if (!isNaN(selectedOptionId)) { reference.Codes.push({ "AttributeId": selectedOptionId, "ItemAttributeFullTextDetails": [] }); } }
-                                        } else { // Text, Textarea, Number -> Add to Comments (Experimental)
-                                            const inputElement = cell.querySelector('input, textarea');
-                                            if (inputElement && inputElement.value.trim()) { const commentPrefix = reference.Comments.trim() ? " | " : ""; reference.Comments += commentPrefix + `${col.title}: ${inputElement.value.trim()}`; }
-                                        }
-                                        // Update QuickCitation if Author/Year columns are coded (optional enhancement)
-                                        if (col.title === 'Authors' && reference.Codes.length > 0) { /* logic to get author name from last code? */ }
-                                        if (col.title === 'Year' && reference.Codes.length > 0) { /* logic to get year name from last code? */ }
+                         allColDefinitions.forEach(colDef => {
+                             if (!colDef || !colDef.id) { console.warn("Skipping processing for invalid colDef:", colDef); return; }
+                             try {
+                                 switch (colDef.type) {
+                                     case 'text': case 'number': { const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`); const input = cell?.querySelector('textarea, input'); if (input && input.value.trim()) { const value = input.value.trim(); if (colDef.title === 'Authors') reference.Authors = value + ", "; if (colDef.title === 'Year') reference.Year = isNaN(parseInt(value)) ? "" : String(parseInt(value)); } break; }
+                                     case 'dropdown': { const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`); const select = cell?.querySelector('select'); const selectedValue = select ? select.value : null; if (selectedValue) { let foundOption = null; if (colDef.options) { if (colDef.hasLevel2) { for(const l1Opt of colDef.options) { foundOption = l1Opt.level2Options?.find(l2 => l2.text === selectedValue); if (foundOption) break; } } if (!foundOption) foundOption = colDef.options.find(opt => opt.text === selectedValue); } if (foundOption?.attributeId && !isNaN(foundOption.attributeId)) { codedAttributeIds[foundOption.attributeId] = true; } else { console.warn(`      AttributeId NOT FOUND for dropdown value "${selectedValue}" in "${colDef.title}".`); } if (colDef.title === 'Country') { reference.Country = selectedValue; } } break; }
+                                     case 'dropdown_multi': { // Read multiple selected values
+                                         const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`);
+                                         const select = cell?.querySelector('select[multiple]');
+                                         if(select){
+                                             const selectedOptionsElements = Array.from(select.selectedOptions);
+                                             selectedOptionsElements.forEach(selectedOptEl => {
+                                                 const selectedValue = selectedOptEl.value; // The text value
+                                                 let foundOption = null;
+                                                 if (colDef.options) { if (colDef.hasLevel2) { for(const l1Opt of colDef.options) { foundOption = l1Opt.level2Options?.find(l2 => l2.text === selectedValue); if (foundOption) break; } } if (!foundOption) foundOption = colDef.options.find(opt => opt.text === selectedValue); }
+                                                 if (foundOption?.attributeId && !isNaN(foundOption.attributeId)) { codedAttributeIds[foundOption.attributeId] = true; } else { console.warn(`      AttributeId NOT FOUND for multi-dropdown value "${selectedValue}" in "${colDef.title}".`); }
+                                             });
+                                         } break;
+                                     }
+                                     case 'checkbox_group': { const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`); if (cell) { cell.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => { const value = checkbox.value; let foundOption = null; if (colDef.options) { foundOption = colDef.options.find(opt => opt.text === value); } if (foundOption?.attributeId && !isNaN(foundOption.attributeId)) { codedAttributeIds[foundOption.attributeId] = true; } else { console.warn(`      AttributeId NOT FOUND for checkbox value "${value}" in "${colDef.title}".`); } if (colDef.title === 'SDG') { keywordList.push(value); } }); } break; }
+                                     case '0/1_per_option': { const optionCells = row.querySelectorAll(`td[data-col-identifier="${colDef.id}"]`); optionCells.forEach(optCell => { const select = optCell.querySelector('select[data-attribute-id]'); if (select && select.value === '1') { const attributeId = parseInt(select.getAttribute('data-attribute-id')); if (!isNaN(attributeId)) { codedAttributeIds[attributeId] = true; if (colDef.title === 'SDG') { keywordList.push(select.getAttribute('data-label'));}} else { console.warn(`      Checkbox(0/1) option selected (value=1) but AttributeId is invalid for label "${select.getAttribute('data-label')}" in "${colDef.title}".`); } } }); break; }
+                                 } } catch (cellError) { console.error(`Error processing cell for column ${colDef.title}:`, cellError); } });
+                         for (const attrIdStr in codedAttributeIds) { if (codedAttributeIds.hasOwnProperty(attrIdStr)) { reference.Codes.push({ AttributeId: parseInt(attrIdStr), ItemAttributeFullTextDetails: [] }); } }
+                         if (keywordList.length > 0) reference.Keywords = keywordList.join('; ');
+                         referencesOutput.push(reference); /* console.log(`  Finished processing row ${rowIndex}. Codes added: ${reference.Codes.length}`); */
+                     });
+                     console.log("--- Finished generatePart2Json (Handles All Types) ---");
+                     return { References: referencesOutput };
+                 } // End generatePart2Json
 
-                                    } catch (colError) { console.warn(`Col Error R${rowIndex+1} C${cellIndex}: ${colError.message}`); }
-                                });
-                                // Refine quick citation potentially based on coded values (complex)
-                                // For now, it remains simplified
-                                references.push(reference);
-                            } catch (rowError) { console.warn(`Row Error R${rowIndex + 1}: ${rowError.message}`); }
-                        }); return references;
-                    } catch (overallError) { alert(`Error generating Part 2 JSON: ${overallError.message}`); console.error("Error generating Part 2 JSON:", overallError); return null; }
-                 } // End generatePart2Json (Modified)
 
                 // --- Public methods ---
-                return {
-                    populateDynamicColumnDefinitionTable, getAllCodableColumnDefinitions,
-                    populateDataEntryTable, generatePart1Json, generatePart2Json,
-                    resetIdCounters, populateDropdownOptionsUI
-                };
+                 return {
+                     addDynamicColumnRow, populateDynamicColumnDefinitionTable, getAllCodableColumnDefinitions,
+                     populateDataEntryTable, addDataEntryRow, generatePart1Json, generatePart2Json,
+                     resetIdCounters, populateDropdownOptionsUI, populateCheckboxOptionsUI,
+                     createCheckboxOption, createDropdownOption, createLevel2OptionsDiv,
+                     handleTypeChange, handleRemoveOption, getOptionsFromUI
+                 };
             })(); // End entryModule IIFE
 
+// END OF CHUNK 6
 
-            // ========================= INITIALIZATION =========================
-             // --- Populate Predefined Columns UI ---
-             function populatePredefinedColumnsTable() {
-                if (!predefinedColumnsTableBody) { console.error("Predefined columns table body not found!"); return; }
-                predefinedColumnsTableBody.innerHTML = '';
-                predefinedColumnData.forEach((colData, index) => {
-                    const row = predefinedColumnsTableBody.insertRow();
-                    const includeCell = row.insertCell(); const includeCheckbox = document.createElement('input'); includeCheckbox.type = 'checkbox'; includeCheckbox.checked = colData.included; includeCheckbox.id = `predef-inc-${index}`; includeCell.appendChild(includeCheckbox);
-                    row.insertCell().textContent = colData.name;
-                    const typeCell = row.insertCell(); const typeSelect = document.createElement('select'); typeSelect.innerHTML = `<option value="text">Text</option><option value="dropdown">Dropdown</option><option value="number">Number</option><option value="textarea">Textarea</option>`; typeSelect.value = colData.type; typeSelect.id = `predef-type-${index}`; typeSelect.disabled = !colData.included; typeCell.appendChild(typeSelect);
-                    const optionsCell = row.insertCell(); optionsCell.id = `predef-options-${index}`; optionsCell.style.verticalAlign = 'top';
-                    const hasL2VisibleCheckbox = document.createElement('input'); hasL2VisibleCheckbox.type = 'checkbox'; hasL2VisibleCheckbox.id = `predef-l2-visible-${index}`; hasL2VisibleCheckbox.checked = colData.hasLevel2; hasL2VisibleCheckbox.style.marginLeft = '0px'; hasL2VisibleCheckbox.style.marginRight = '3px';
-                    const l2Label = document.createElement('label'); l2Label.htmlFor = hasL2VisibleCheckbox.id; l2Label.textContent = ' Has Level 2?'; l2Label.style.fontWeight = 'normal'; l2Label.style.display = 'inline-block'; l2Label.style.marginBottom = '5px';
-                    const l2Container = document.createElement('div'); l2Container.id = `predef-l2-container-${index}`; l2Container.appendChild(hasL2VisibleCheckbox); l2Container.appendChild(l2Label); optionsCell.appendChild(l2Container);
-                    const hasLevel2HiddenCheckbox = document.createElement("input"); hasLevel2HiddenCheckbox.type = "checkbox"; hasLevel2HiddenCheckbox.checked = colData.hasLevel2; hasLevel2HiddenCheckbox.id = `predef-l2-hidden-${index}`; hasLevel2HiddenCheckbox.style.display = 'none'; optionsCell.appendChild(hasLevel2HiddenCheckbox);
-                    const dropdownOptionsContainer = document.createElement("div"); dropdownOptionsContainer.classList.add("dropdown-options-container"); optionsCell.appendChild(dropdownOptionsContainer);
-                    const showOptionsUI = colData.included && colData.type === 'dropdown';
-                    optionsCell.style.display = showOptionsUI ? 'table-cell' : 'none'; l2Container.style.display = showOptionsUI ? 'block' : 'none'; hasL2VisibleCheckbox.checked = colData.hasLevel2; hasLevel2HiddenCheckbox.checked = colData.hasLevel2;
-                    if (showOptionsUI) { entryModule.populateDropdownOptionsUI(dropdownOptionsContainer, index, hasLevel2HiddenCheckbox, updateDiagramDisplay); }
-                    includeCheckbox.addEventListener('change', () => {
-                        colData.included = includeCheckbox.checked; typeSelect.disabled = !colData.included; const currentType = typeSelect.value; const shouldShowOptions = colData.included && currentType === 'dropdown';
-                        optionsCell.style.display = shouldShowOptions ? 'table-cell' : 'none'; l2Container.style.display = shouldShowOptions ? 'block' : 'none';
-                        if (!colData.included) { dropdownOptionsContainer.innerHTML = ''; colData.type = 'text'; typeSelect.value = 'text'; colData.options = []; colData.hasLevel2 = false; hasL2VisibleCheckbox.checked = false; hasLevel2HiddenCheckbox.checked = false; }
-                        else if (shouldShowOptions && dropdownOptionsContainer.innerHTML.trim() === '') { entryModule.populateDropdownOptionsUI(dropdownOptionsContainer, index, hasLevel2HiddenCheckbox, updateDiagramDisplay); hasL2VisibleCheckbox.checked = colData.hasLevel2; hasLevel2HiddenCheckbox.checked = colData.hasLevel2; }
-                        updateDiagramDisplay();
-                    });
-                    typeSelect.addEventListener('change', () => {
-                        colData.type = typeSelect.value; const shouldShowOptions = colData.included && colData.type === 'dropdown'; optionsCell.style.display = shouldShowOptions ? 'table-cell' : 'none'; l2Container.style.display = shouldShowOptions ? 'block' : 'none';
-                        if (shouldShowOptions) { hasL2VisibleCheckbox.checked = colData.hasLevel2; hasLevel2HiddenCheckbox.checked = colData.hasLevel2; if(dropdownOptionsContainer.innerHTML.trim() === '') { entryModule.populateDropdownOptionsUI(dropdownOptionsContainer, index, hasLevel2HiddenCheckbox, updateDiagramDisplay); } }
-                        else { dropdownOptionsContainer.innerHTML = ''; colData.options = []; colData.hasLevel2 = false; hasL2VisibleCheckbox.checked = false; hasLevel2HiddenCheckbox.checked = false; }
-                        updateDiagramDisplay();
-                    });
-                    hasL2VisibleCheckbox.addEventListener('change', () => {
-                         colData.hasLevel2 = hasL2VisibleCheckbox.checked; hasLevel2HiddenCheckbox.checked = colData.hasLevel2; const level1Options = dropdownOptionsContainer.querySelectorAll(".dropdown-option");
-                         level1Options.forEach(level1Div => { const level2Div = level1Div.querySelector(".dropdown-level2-options"); if(level2Div) level2Div.style.display = colData.hasLevel2 ? 'block' : 'none'; }); updateDiagramDisplay();
-                     });
-                });
-             } // End populatePredefinedColumnsTable
 
-            populatePredefinedColumnsTable(); // Initial population
-            updateDiagramDisplay(); // Initial diagram update
 
-            // ========================= UTILITY/HELPER FUNCTION DEFS =========================
-             // --- Update Diagram Display --- (Handles ALL Included Codable Defs)
-             function updateDiagramDisplay() { /* ... as before ... */
-                 const allCodableDefinitions = entryModule.getAllCodableColumnDefinitions(); const diagramDisplay = document.getElementById('diagramDisplay'); diagramDisplay.innerHTML = '';
-                 const dropdownDefs = allCodableDefinitions.filter(def => def.type === 'dropdown');
-                 if (dropdownDefs.length > 0) {
-                     diagramDisplay.style.display = "block"; const diagramContainer = document.createElement("div"); diagramContainer.classList.add("diagram-container");
-                     dropdownDefs.forEach((colDef) => {
-                         const columnDiv = document.createElement("div"); columnDiv.classList.add("diagram-column"); const titleBox = document.createElement("div"); titleBox.classList.add("level1-box"); titleBox.textContent = colDef.title; columnDiv.appendChild(titleBox);
-                         colDef.options.forEach((option, optionIndex) => {
-                             const level1Container = document.createElement("div"); level1Container.classList.add("level1-to-level2"); const level1Box = document.createElement("div"); level1Box.classList.add("level1-box"); level1Box.textContent = option.name || `L1 Option ${optionIndex + 1}`; level1Container.appendChild(level1Box);
-                             if (colDef.hasLevel2 && option.level2Options && option.level2Options.length > 0) {
-                                 const level2OptionsDiv = document.createElement("div"); level2OptionsDiv.classList.add("level2-options"); level2OptionsDiv.style.display = "block";
-                                 option.level2Options.forEach((level2Option, level2Index) => { const level2Box = document.createElement("div"); level2Box.classList.add("level2-box"); level2Box.textContent = level2Option.name || `L2 Option ${level2Index + 1}`; level2OptionsDiv.appendChild(level2Box); }); level1Container.appendChild(level2OptionsDiv);
-                             } columnDiv.appendChild(level1Container);
-                         }); diagramContainer.appendChild(columnDiv);
-                     });
-                     const diagramHeader = document.createElement("h5"); diagramHeader.textContent = "Codable Columns Structure Diagram"; diagramHeader.style.marginBottom = '10px'; const diagramInstruction = document.createElement("p"); diagramInstruction.classList.add("instruction"); diagramInstruction.textContent = "Visual representation of dropdown columns and their options.";
-                     diagramDisplay.insertBefore(diagramInstruction, diagramContainer); diagramDisplay.insertBefore(diagramHeader, diagramInstruction); diagramDisplay.appendChild(diagramContainer);
-                 } else { diagramDisplay.style.display = "none"; }
-             }
+            // ========================= GLOBAL FUNCTIONS & INITIALIZATION =========================
+             function updateDiagramDisplay() { /* ... same enhanced version ... */ try { if (typeof entryModule === 'undefined' || typeof entryModule.getAllCodableColumnDefinitions !== 'function') { return; } if (!diagramDisplay || !diagramContainer) return; const allCodableDefinitions = entryModule.getAllCodableColumnDefinitions(); diagramContainer.innerHTML = ''; if (allCodableDefinitions.length > 0) { diagramDisplay.style.display = "block"; allCodableDefinitions.forEach((colDef) => { const columnDiv = document.createElement("div"); columnDiv.classList.add("diagram-column"); const titleDiv = document.createElement("div"); titleDiv.classList.add("diagram-column-title"); titleDiv.textContent = colDef.title || "[Untitled Column]"; columnDiv.appendChild(titleDiv); const typeDiv = document.createElement("div"); typeDiv.classList.add("diagram-column-type"); typeDiv.textContent = `Type: ${colDef.type.replace('_', ' ')}`; columnDiv.appendChild(typeDiv); if ((colDef.type === 'dropdown' || colDef.type === 'dropdown_multi' || colDef.type === 'checkbox_group' || colDef.type === '0/1_per_option') && colDef.options && colDef.options.length > 0) { colDef.options.forEach(opt => { const optDiv = document.createElement("div"); optDiv.classList.add("diagram-option-item"); optDiv.textContent = opt.text || "[Empty Option]"; columnDiv.appendChild(optDiv); if (colDef.hasLevel2 && opt.level2Options && opt.level2Options.length > 0) { opt.level2Options.forEach(l2Opt => { const l2OptDiv = document.createElement("div"); l2OptDiv.classList.add("diagram-option-item", "diagram-option-l2"); l2OptDiv.textContent = l2Opt.text || "[Empty L2 Option]"; columnDiv.appendChild(l2OptDiv); }); } }); } else if (colDef.type !== 'text' && colDef.type !== 'number') { const noOptDiv = document.createElement("div"); noOptDiv.classList.add("diagram-option-item"); noOptDiv.style.fontStyle = 'italic'; noOptDiv.style.color = '#999'; noOptDiv.textContent = "(No options defined)"; columnDiv.appendChild(noOptDiv); } diagramContainer.appendChild(columnDiv); }); } else { diagramDisplay.style.display = "none"; } } catch(diagError) { console.error("Error updating diagram:", diagError); if(diagramDisplay) { diagramDisplay.innerHTML = `<p style="color: red;">Error updating diagram: ${diagError.message}</p>`; diagramDisplay.style.display = "block"; } } }
+             function handleAddDataRowClick() { if (!dataEntryTableBody || !entryModule) { displayError("Cannot add row: Table body or module not ready.", "handleAddDataRowClick"); return; } try { const currentRowCount = dataEntryTableBody.rows.length; const allColDefs = entryModule.getAllCodableColumnDefinitions(); entryModule.addDataEntryRow(currentRowCount + 1, allColDefs, null); } catch (error) { console.error("Error adding data row:", error); displayError(error.message, "handleAddDataRowClick", 0, error); } }
 
-             // --- Handle Paste Data --- (Accounts for 3 fixed + ALL codable cols)
-             async function handlePasteDataClick() { /* ... as before ... */
-                 showLoadingOverlay(); await new Promise(resolve => setTimeout(resolve, 50));
-                 try {
-                     const allCodableDefinitions = entryModule.getAllCodableColumnDefinitions(); const numFixedInitial = 3; const numCodable = allCodableDefinitions.length; const numExpectedCols = numFixedInitial + numCodable; const numDefinedRows = parseInt(numRowsInput.value);
-                     const text = await navigator.clipboard.readText(); const rows = text.split('\n').map(row => row.split('\t')); const pastedData = rows.filter(row => row.length > 0 && row.some(cell => cell.trim() !== ''));
-                     if (pastedData.length === 0) { alert("No valid data found in clipboard."); hideLoadingOverlay(); return; } const firstRowCols = pastedData[0].length;
-                     if (firstRowCols !== numExpectedCols) { if (!confirm(`Warning: Expected ${numExpectedCols} columns (${numFixedInitial} initial + ${numCodable} codable), but found ${firstRowCols}. Continue anyway?`)) { hideLoadingOverlay(); return; } }
-                     if (pastedData.length !== numDefinedRows) { if (!confirm(`Pasted ${pastedData.length} rows, expected ${numDefinedRows}. Adjust table size?`)) { hideLoadingOverlay(); return; } numRowsInput.value = pastedData.length; entryModule.populateDataEntryTable(pastedData.length); }
-                     else if (!dataEntryTable.querySelector('tbody tr')) { entryModule.populateDataEntryTable(pastedData.length); }
-                     const tableBodyRows = dataEntryTable.querySelectorAll('tbody tr');
-                     for (let i = 0; i < pastedData.length; i++) {
-                         const targetRow = tableBodyRows[i]; if (!targetRow) continue; const pastedCols = pastedData[i]; const targetCells = targetRow.cells;
-                         for (let j = 0; j < targetCells.length && j < pastedCols.length; j++) {
-                             const cell = targetCells[j]; const pastedValue = (pastedCols[j] || "").trim();
-                             if (j < numFixedInitial) { const inputElement = cell.querySelector("input"); if (inputElement) inputElement.value = pastedValue; }
-                             else { const defIndex = j - numFixedInitial; if (allCodableDefinitions[defIndex]) { const colDef = allCodableDefinitions[defIndex]; if (colDef.type === "text" || colDef.type === "number" || colDef.type === "textarea") { const inputElement = cell.querySelector("input, textarea"); if (inputElement) inputElement.value = pastedValue; }
-                                 else if (colDef.type === "dropdown") { const select = cell.querySelector("select"); if (select) { let found = false; for (let k = 0; k < select.options.length; k++) { if (!select.options[k].disabled && select.options[k].text.trim().toLowerCase() === pastedValue.toLowerCase()) { select.value = select.options[k].value; found = true; break; } } if (!found) { console.warn(`Pasted value "${pastedValue}" not found in dropdown "${colDef.title}" row ${i+1}.`); select.value = ""; } } } } }
-                         }
-                     } pasteSuccessMessage.style.display = 'inline-block'; setTimeout(() => { pasteSuccessMessage.style.display = 'none'; }, 3000);
-                 } catch (error) { console.error("Error handling paste data:", error); if (error.name === 'NotAllowedError' || error.message.includes('Read permission denied')) { alert("Clipboard access denied."); } else { alert("Failed to paste data."); }
-                 } finally { hideLoadingOverlay(); }
-             }
+             // --- Paste Data (Handles Abstract, BOTH Checkbox Types, Multi-Dropdown with COMMA separation) ---
+             async function handlePasteDataClick() { if (!dataEntryTableBody || !entryModule) { displayError("Cannot paste: Table body or module not ready.", "handlePasteDataClick"); return; } showLoadingOverlay(); try { const clipboardText = await navigator.clipboard.readText(); if (!clipboardText) { alert("Clipboard empty or permission denied."); hideLoadingOverlay(); return; } const lines = clipboardText.trim().split('\n'); const dataRows = lines.map(line => line.split('\t')); const allColDefs = entryModule.getAllCodableColumnDefinitions(); let expectedColumnCount = 3; allColDefs.forEach(colDef => { if (colDef.type === '0/1_per_option') { expectedColumnCount += (colDef.options || []).length; } else { expectedColumnCount += 1; } }); if (dataRows.length === 0) { alert("No data rows found."); hideLoadingOverlay(); return; } if (dataRows[0].length !== expectedColumnCount && !confirm(`Pasted data (${dataRows[0].length} cols) doesn't match expected table structure (${expectedColumnCount} cols based on definitions). Continue anyway?`)) { hideLoadingOverlay(); return; } dataEntryTableBody.innerHTML = ''; let rowsPasted = 0; dataRows.forEach((cols, index) => { const rowIndex = index + 1; const rowData = { itemTitle: cols[0] || '', itemURL: cols[1] || '', itemAbstract: cols[2] || '', codedData: {} }; let currentPasteColIndex = 3; allColDefs.forEach((colDef) => { if (colDef.type === '0/1_per_option') { const checkboxData = {}; (colDef.options || []).forEach((opt, optIndex) => { const pastedValue = cols[currentPasteColIndex + optIndex] !== undefined ? cols[currentPasteColIndex + optIndex].trim() : '0'; checkboxData[opt.text] = (pastedValue === '1') ? 1 : 0; }); rowData.codedData[colDef.id] = checkboxData; currentPasteColIndex += (colDef.options || []).length; } else { const pastedValue = cols[currentPasteColIndex] !== undefined ? cols[currentPasteColIndex].trim() : '';
+                 if (colDef.type === 'checkbox_group') { rowData.codedData[colDef.id] = pastedValue ? pastedValue.split(';').map(s => s.trim()).filter(Boolean) : []; } // Semicolon for standard checkbox
+                 else if (colDef.type === 'dropdown_multi') { rowData.codedData[colDef.id] = pastedValue ? pastedValue.split(',').map(s => s.trim()).filter(Boolean) : []; } // COMMA for multi-dropdown
+                 else { rowData.codedData[colDef.id] = pastedValue; } currentPasteColIndex += 1; } }); entryModule.addDataEntryRow(rowIndex, allColDefs, rowData); rowsPasted++; }); if (numRowsInput) numRowsInput.value = rowsPasted; if (pasteSuccessMessageInline) { pasteSuccessMessageInline.textContent = `${rowsPasted} rows pasted!`; pasteSuccessMessageInline.style.display = 'inline-block'; setTimeout(() => { pasteSuccessMessageInline.style.display = 'none'; }, 3000); } } catch (error) { console.error("Error pasting data:", error); displayError(`Error pasting data: ${error.message}`, "handlePasteDataClick", 0, error); } finally { hideLoadingOverlay(); } }
+
+             function handleClearTableClick() { if (!dataEntryTableBody) return; if (confirm("Clear all data entered in the table? Cannot be undone.")) { dataEntryTableBody.innerHTML = ''; dataEntryArea.style.display = 'none'; if (numRowsInput) numRowsInput.value = 0; } }
+             function displayLocalStorageStatus(message, color = 'green', duration = 3000) { if (!localStorageStatus) return; localStorageStatus.textContent = message; localStorageStatus.style.color = color; localStorageStatus.style.display = 'inline'; setTimeout(() => { localStorageStatus.style.display = 'none'; localStorageStatus.textContent = ''; }, duration); }
+
+             // --- Save/Load adjusted for Abstract, BOTH Checkbox types, Multi-Dropdown ---
+             function saveDataToLocalStorage() { showLoadingOverlay(); setTimeout(() => { try { const state = { studyTitle: studyTitleInput?.value || '', tableData: [] }; const allDefs = entryModule.getAllCodableColumnDefinitions(); state.predefinedColumnConfig = allDefs.filter(d => d.isPredefined); state.dynamicColumnDefinitions = allDefs.filter(d => !d.isPredefined); if (dataEntryTableBody) { state.numRows = dataEntryTableBody.rows.length; dataEntryTableBody.querySelectorAll('tr').forEach(row => { const rowData = { rowInternalId: row.id, itemTitle: row.querySelector('input[data-field="itemTitle"]')?.value || '', itemURL: row.querySelector('input[data-field="itemURL"]')?.value || '', itemAbstract: row.querySelector('textarea[data-field="itemAbstract"]')?.value || '', codedData: {} }; allDefs.forEach(colDef => { let valueToSave; if (colDef.type === '0/1_per_option') { valueToSave = {}; const checkboxCells = row.querySelectorAll(`td[data-col-identifier="${colDef.id}"]`); checkboxCells.forEach(cbCell => { const select = cbCell.querySelector('select[data-label]'); const label = select?.getAttribute('data-label'); if (label) { valueToSave[label] = select.value === '1' ? 1 : 0; } }); } else { const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`); if (cell) { switch (colDef.type) { case 'text': case 'number': valueToSave = cell.querySelector('textarea, input')?.value || ''; break; case 'dropdown': valueToSave = cell.querySelector('select:not([multiple])')?.value || ''; break; case 'dropdown_multi': valueToSave = Array.from(cell.querySelectorAll('select[multiple] option:checked')).map(opt => opt.value); break; case 'checkbox_group': valueToSave = Array.from(cell.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value); break; default: valueToSave = undefined; } } } if (valueToSave !== undefined) { rowData.codedData[colDef.id] = valueToSave; } }); state.tableData.push(rowData); }); } else { state.numRows = parseInt(numRowsInput?.value) || 0; } localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)); displayLocalStorageStatus("Data saved successfully!", "green"); } catch (error) { console.error("Error saving data:", error); displayLocalStorageStatus("Error saving data!", "red"); displayError(error.message, "saveDataToLocalStorage", 0, error); } finally { hideLoadingOverlay(); } }, 50); }
+             function loadDataFromLocalStorage() { showLoadingOverlay(); setTimeout(() => { try { const savedData = localStorage.getItem(LOCAL_STORAGE_KEY); if (!savedData) { displayLocalStorageStatus("No saved data found.", "orange"); hideLoadingOverlay(); return; } const state = JSON.parse(savedData); console.log("Loading data from localStorage:", state); resetIdCounters(); if (predefinedColumnsTableBody) predefinedColumnsTableBody.innerHTML = ''; if (columnDefinitionTableBody) columnDefinitionTableBody.innerHTML = ''; if (dataEntryTableBody) dataEntryTableBody.innerHTML = ''; if (dataEntryTableHead) dataEntryTableHead.innerHTML = ''; if (dataEntryArea) dataEntryArea.style.display = 'none'; if (columnDefinitionArea) columnDefinitionArea.style.display = 'none'; if (diagramDisplay) diagramDisplay.style.display = 'none'; if (studyTitleInput) studyTitleInput.value = state.studyTitle || ''; if (numRowsInput) numRowsInput.value = state.numRows || 0; populatePredefinedColumnsTable(state.predefinedColumnConfig || null); const numDynColsToLoad = state.dynamicColumnDefinitions ? state.dynamicColumnDefinitions.length : 0; if (entryModule && numDynColsToLoad > 0) { entryModule.populateDynamicColumnDefinitionTable(0, state.dynamicColumnDefinitions); } else { if (columnDefinitionArea) columnDefinitionArea.style.display = 'block'; if(columnDefinitionTableBody) columnDefinitionTableBody.innerHTML = ''; } const allRestoredColDefs = entryModule.getAllCodableColumnDefinitions(); if (entryModule && state.numRows > 0 && allRestoredColDefs.length > 0) { entryModule.populateDataEntryTable(state.numRows, allRestoredColDefs, state.tableData || null); if (dataEntryArea) dataEntryArea.style.display = 'block'; } else if (dataEntryArea) { dataEntryArea.style.display = 'none'; } updateDiagramDisplay(); displayLocalStorageStatus("Data loaded successfully!", "green"); } catch (error) { console.error("Error loading data:", error); displayLocalStorageStatus("Error loading data!", "red"); displayError(error.message, "loadDataFromLocalStorage", 0, error); populatePredefinedColumnsTable(); if (columnDefinitionArea) columnDefinitionArea.style.display = 'none'; if (dataEntryArea) dataEntryArea.style.display = 'none'; } finally { hideLoadingOverlay(); } }, 50); }
+             function clearSavedData() { if (confirm("Clear all saved data? Cannot be undone.")) { localStorage.removeItem(LOCAL_STORAGE_KEY); displayLocalStorageStatus("Saved data cleared.", "orange"); } }
+             // --- Populate Predefined Columns Table (Handles All Current Types) ---
+             function populatePredefinedColumnsTable(savedConfig = null) { if (!predefinedColumnsTableBody) { console.error("Predefined columns table body not found."); return; } predefinedColumnsTableBody.innerHTML = ''; predefinedColumnData.forEach((colData, index) => { const savedColData = savedConfig ? savedConfig.find(sc => sc.internalName === colData.internalName) : null; const isIncluded = savedColData ? true : colData.included; const currentType = savedColData ? savedColData.type : colData.type; const hasLevel2 = savedColData ? savedColData.hasLevel2 : colData.hasLevel2; const optionsToLoad = savedColData ? savedColData.options : colData.options; const colIdentifier = savedColData ? savedColData.id : `predef-${sanitizeForId(colData.name)}`; const colAttributeId = savedColData?.colAttributeId || generateAttributeId(); const row = predefinedColumnsTableBody.insertRow(); row.setAttribute('data-col-identifier', colIdentifier); row.setAttribute('data-col-attribute-id', colAttributeId); /* Removed SetId/AttributeSetId */ const includeCell = row.insertCell(); includeCell.style.textAlign = 'center'; const includeCheckbox = document.createElement('input'); includeCheckbox.type = 'checkbox'; includeCheckbox.checked = isIncluded; includeCheckbox.title = `Include '${colData.nameDisplay || colData.name}'`; includeCell.appendChild(includeCheckbox); const nameCell = row.insertCell(); nameCell.textContent = colData.nameDisplay || colData.name; nameCell.title = colData.description || ''; const typeCell = row.insertCell(); const typeSelect = document.createElement('select');
+                 const typeOptions = [ { value: "text", text: "Text" }, { value: "dropdown", text: "Dropdown (Single)" }, { value: "dropdown_multi", text: "Dropdown (Multi)" }, { value: "checkbox_group", text: "Checkbox Group" }, { value: "0/1_per_option", text: "Checkbox (0/1)" }, { value: "number", text: "Number" } ]; // Updated Types
+                 typeOptions.forEach(optData => { const optionElement = document.createElement('option'); optionElement.value = optData.value; optionElement.textContent = optData.text; typeSelect.appendChild(optionElement); }); typeSelect.value = currentType; typeSelect.setAttribute('data-col-identifier', colIdentifier); typeCell.appendChild(typeSelect); const hasLevel2Cell = row.insertCell(); hasLevel2Cell.style.textAlign = 'center'; hasLevel2Cell.style.verticalAlign = 'middle'; hasLevel2Cell.style.visibility = 'hidden'; const hasLevel2HiddenCheckbox = document.createElement("input"); hasLevel2HiddenCheckbox.type = "checkbox"; hasLevel2HiddenCheckbox.id = `pre-l2-hidden-${colIdentifier}`; hasLevel2HiddenCheckbox.checked = hasLevel2; hasLevel2HiddenCheckbox.style.display = 'none'; hasLevel2Cell.appendChild(hasLevel2HiddenCheckbox); const hasLevel2VisibleCheckbox = document.createElement("input"); hasLevel2VisibleCheckbox.type = "checkbox"; hasLevel2VisibleCheckbox.id = `pre-l2-visible-${colIdentifier}`; hasLevel2VisibleCheckbox.style.display = 'none'; hasLevel2VisibleCheckbox.title = "Enable Level 2 options"; hasLevel2Cell.appendChild(hasLevel2VisibleCheckbox); const l2Label = document.createElement('label'); l2Label.htmlFor = hasLevel2VisibleCheckbox.id; l2Label.textContent = ' L2?'; l2Label.style.fontWeight = 'normal'; l2Label.style.display = 'none'; l2Label.title = "Enable Level 2 options"; hasLevel2Cell.appendChild(l2Label); const optionsCell = row.insertCell(); optionsCell.style.verticalAlign = 'top'; optionsCell.style.display = 'none'; const optionsContainerPlaceholder = document.createElement("div"); optionsContainerPlaceholder.classList.add("options-container-placeholder"); optionsContainerPlaceholder.setAttribute('data-col-identifier', colIdentifier); optionsCell.appendChild(optionsContainerPlaceholder); typeSelect.addEventListener("change", function() { entryModule.handleTypeChange(this); }); hasLevel2VisibleCheckbox.addEventListener("change", function() { if (typeSelect.value === 'dropdown' || typeSelect.value === 'dropdown_multi') { hasLevel2HiddenCheckbox.checked = this.checked; const currentOptionsContainer = optionsCell.querySelector('.dropdown-options-container'); if (currentOptionsContainer) { const currentOptions = entryModule.getOptionsFromUI(currentOptionsContainer); entryModule.populateDropdownOptionsUI(currentOptionsContainer, colIdentifier, hasLevel2HiddenCheckbox, currentOptions); } updateDiagramDisplay(); } }); entryModule.handleTypeChange(typeSelect); if ((currentType === 'dropdown' || currentType === 'dropdown_multi' || currentType === 'checkbox_group' || currentType === '0/1_per_option') && optionsToLoad && optionsToLoad.length > 0) { const currentOptionsContainer = optionsCell.querySelector('.dropdown-options-container, .checkbox-options-container'); if (currentOptionsContainer) { if (currentType.startsWith('dropdown')) entryModule.populateDropdownOptionsUI(currentOptionsContainer, colIdentifier, hasLevel2HiddenCheckbox, optionsToLoad); else entryModule.populateCheckboxOptionsUI(currentOptionsContainer, colIdentifier, optionsToLoad); } else console.error(`Options container not found for predefined ${colData.name} during load.`); } }); }
+             function handleCreateTableClick() { showLoadingOverlay(); setTimeout(() => { try { const numRows = parseInt(numRowsInput?.value) || 0; if (!validateNumRows(numRows)) { hideLoadingOverlay(); return; } const allColDefinitions = entryModule.getAllCodableColumnDefinitions(); if (allColDefinitions.length === 0) { alert("Please include/define at least one codable column."); hideLoadingOverlay(); return; } entryModule.populateDataEntryTable(numRows, allColDefinitions, null); } catch (error) { console.error("Error creating data entry table:", error); displayError(error.message, "handleCreateTableClick", 0, error); } finally { hideLoadingOverlay(); } }, 50); }
+             function generateAndDisplayJson(parts = ['part1', 'part2']) { showLoadingOverlay(); setTimeout(() => { try { const allColDefinitions = entryModule.getAllCodableColumnDefinitions(); if (allColDefinitions.length === 0 && (parts.includes('part1') || parts.includes('part2'))) { alert("Define/include columns before generating JSON."); hideLoadingOverlay(); return;} const currentDataRows = dataEntryTableBody ? dataEntryTableBody.rows.length : 0; if (currentDataRows === 0 && parts.includes('part2')) { alert("Create table/rows before generating References."); hideLoadingOverlay(); return;} let finalJson = {}; let part1Json = {}; let part2Json = {}; if (parts.includes('part1')) part1Json = entryModule.generatePart1Json(allColDefinitions); if (parts.includes('part2')) part2Json = entryModule.generatePart2Json(allColDefinitions, currentDataRows); finalJson = { ...part1Json, ...part2Json }; const jsonString = JSON.stringify(finalJson, null, 2); if (jsonDisplayDiv) jsonDisplayDiv.textContent = jsonString; if (jsonOutputTextarea) jsonOutputTextarea.value = jsonString; if (jsonDisplayArea) jsonDisplayArea.style.display = 'block'; } catch (error) { console.error("Error generating JSON:", error); if (jsonDisplayDiv) jsonDisplayDiv.textContent = `Error generating JSON: ${error.message}`; if (jsonOutputTextarea) jsonOutputTextarea.value = ''; if (jsonDisplayArea) jsonDisplayArea.style.display = 'block'; displayError(error.message, "generateAndDisplayJson", 0, error); } finally { hideLoadingOverlay(); } }, 50); }
+             function downloadJsonFile() { if (!jsonOutputTextarea || !jsonOutputTextarea.value) { alert("No JSON data generated."); return; } try { const studyTitle = sanitizeForId(studyTitleInput?.value || 'eppi_mapper_data'); const filename = `${studyTitle}_${new Date().toISOString().slice(0,10)}.json`; const blob = new Blob([jsonOutputTextarea.value], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); } catch (error) { console.error("Error downloading JSON:", error); displayError(error.message, "downloadJsonFile", 0, error); } }
+             // --- Export/Import State Functions ---
+             function exportStateToFile() { console.log("Exporting current state..."); showLoadingOverlay(); setTimeout(() => { try { const state = { studyTitle: studyTitleInput?.value || '', tableData: [] }; const allDefs = entryModule.getAllCodableColumnDefinitions(); state.predefinedColumnConfig = allDefs.filter(d => d.isPredefined); state.dynamicColumnDefinitions = allDefs.filter(d => !d.isPredefined); state.numRows = dataEntryTableBody ? dataEntryTableBody.rows.length : 0; if (dataEntryTableBody) { Array.from(dataEntryTableBody.rows).forEach(row => { const rowData = { rowInternalId: row.id, itemTitle: row.querySelector('input[data-field="itemTitle"]')?.value || '', itemURL: row.querySelector('input[data-field="itemURL"]')?.value || '', itemAbstract: row.querySelector('textarea[data-field="itemAbstract"]')?.value || '', codedData: {} }; allDefs.forEach(colDef => { let valueToSave; if (colDef.type === '0/1_per_option') { valueToSave = {}; const checkboxCells = row.querySelectorAll(`td[data-col-identifier="${colDef.id}"]`); checkboxCells.forEach(cbCell => { const select = cbCell.querySelector('select[data-label]'); const label = select?.getAttribute('data-label'); if (label) { valueToSave[label] = select.value === '1' ? 1 : 0; } }); } else { const cell = row.querySelector(`td[data-col-identifier="${colDef.id}"]`); if (cell) { switch (colDef.type) { case 'text': case 'number': valueToSave = cell.querySelector('textarea, input')?.value || ''; break; case 'dropdown': valueToSave = cell.querySelector('select:not([multiple])')?.value || ''; break; case 'dropdown_multi': valueToSave = Array.from(cell.querySelectorAll('select[multiple] option:checked')).map(opt => opt.value); break; case 'checkbox_group': valueToSave = Array.from(cell.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value); break; default: valueToSave = undefined; } } } if (valueToSave !== undefined) { rowData.codedData[colDef.id] = valueToSave; } }); state.tableData.push(rowData); }); } const jsonString = JSON.stringify(state, null, 2); const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' }); const studyTitle = sanitizeForId(state.studyTitle || 'eppi_template_state'); const filename = `${studyTitle}_${new Date().toISOString().slice(0,10)}_STATE.json`; const link = document.createElement("a"); const url = URL.createObjectURL(blob); link.setAttribute("href", url); link.setAttribute("download", filename); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); console.log("State exported."); displayLocalStorageStatus("State exported to file.", "blue"); } catch (error) { console.error("Error exporting state:", error); displayError("Error exporting state.", "exportStateToFile", 0, error); } finally { hideLoadingOverlay(); } }, 50); }
+            function importStateFromFile(event) { const file = event.target.files[0]; if (!file) { return; } console.log(`Importing state from: ${file.name}`); showLoadingOverlay(); const reader = new FileReader(); reader.onload = function(e) { try { const state = JSON.parse(e.target.result); console.log("Loaded state from file:", state); resetIdCounters(); if (predefinedColumnsTableBody) predefinedColumnsTableBody.innerHTML = ''; if (columnDefinitionTableBody) columnDefinitionTableBody.innerHTML = ''; if (dataEntryTableBody) dataEntryTableBody.innerHTML = ''; if (dataEntryTableHead) dataEntryTableHead.innerHTML = ''; if (dataEntryArea) dataEntryArea.style.display = 'none'; if (columnDefinitionArea) columnDefinitionArea.style.display = 'none'; if (diagramDisplay) diagramDisplay.style.display = 'none'; if (studyTitleInput) studyTitleInput.value = state.studyTitle || ''; if (numRowsInput) numRowsInput.value = state.numRows || 0; populatePredefinedColumnsTable(state.predefinedColumnConfig || null); const numDynColsToLoad = state.dynamicColumnDefinitions ? state.dynamicColumnDefinitions.length : 0; if (entryModule && numDynColsToLoad > 0) { entryModule.populateDynamicColumnDefinitionTable(0, state.dynamicColumnDefinitions); } else { if (columnDefinitionArea) columnDefinitionArea.style.display = 'block'; if(columnDefinitionTableBody) columnDefinitionTableBody.innerHTML = ''; } const allRestoredColDefs = entryModule.getAllCodableColumnDefinitions(); if (entryModule && state.numRows > 0 && allRestoredColDefs.length > 0) { entryModule.populateDataEntryTable(state.numRows, allRestoredColDefs, state.tableData || null); if (dataEntryArea) dataEntryArea.style.display = 'block'; } else if (dataEntryArea) { dataEntryArea.style.display = 'none'; } updateDiagramDisplay(); displayLocalStorageStatus("State imported successfully!", "green"); if(importStatusSpan) { importStatusSpan.textContent = "Import successful!"; importStatusSpan.style.display = 'inline-block'; setTimeout(() => { importStatusSpan.style.display = 'none'; }, 3000); } } catch (error) { console.error("Error importing state:", error); displayLocalStorageStatus("Error importing state!", "red"); displayError(error.message, "importStateFromFile", 0, error); if(importStatusSpan) { importStatusSpan.textContent = "Import failed!"; importStatusSpan.style.color = 'red'; importStatusSpan.style.display = 'inline-block'; setTimeout(() => { importStatusSpan.style.display = 'none'; importStatusSpan.style.color = 'green'; }, 3000); } } finally { hideLoadingOverlay(); event.target.value = null; } }; reader.onerror = function() { displayError("Error reading file.", "FileReader", 0, reader.error); hideLoadingOverlay(); event.target.value = null; }; reader.readAsText(file); }
+
+// END OF CHUNK 7
+
+
 
             // ========================= MAIN EVENT LISTENERS =========================
-             defineColumnsButton.addEventListener('click', function() { /* ... as before ... */ showLoadingOverlay(); setTimeout(() => { try { const numDynCols = parseInt(numColsSelect.value); if (numDynCols >= 0) { columnDefinitionArea.style.display = numDynCols > 0 ? "block" : "none"; entryModule.populateDynamicColumnDefinitionTable(numDynCols, updateDiagramDisplay); } enterDataButton.style.display = "inline-block"; updateDiagramDisplay(); } catch (error) { console.error("Error defining dynamic columns:", error); alert("Failed to define dynamic columns."); } finally { hideLoadingOverlay(); } }, 50); });
-             enterDataButton.addEventListener('click', function() { /* ... as before ... */ showLoadingOverlay(); setTimeout(() => { try { const numRows = parseInt(numRowsInput.value); if (!validateNumRows(numRows)) { hideLoadingOverlay(); return; } dataEntryArea.style.display = "block"; entryModule.populateDataEntryTable(numRows); } catch (error) { console.error("Error creating data entry table:", error); alert("Failed to create data entry table."); } finally { hideLoadingOverlay(); } }, 50); });
-             clearTableButton.addEventListener('click', function() { /* ... as before ... */ if (confirm("Clear all data entry rows?")) { showLoadingOverlay(); setTimeout(() => { try { const tbody = dataEntryTable.querySelector("tbody"); if (tbody) { tbody.innerHTML = ''; } } catch (error) { console.error("Error clearing table:", error); alert("Failed to clear table."); } finally { hideLoadingOverlay(); } }, 50); } });
-             pasteDataButton.addEventListener('click', handlePasteDataClick);
-             generatePart1JSONButton.addEventListener('click', function() { /* ... as before ... */ showLoadingOverlay(); setTimeout(() => { try { const codeSet = entryModule.generatePart1Json(); if (!codeSet) throw new Error("Part 1 failed."); const finalCodeSets = { CodeSets: [codeSet] }; const jsonString = JSON.stringify(finalCodeSets, null, 2); jsonOutputTextarea.value = jsonString; jsonDisplayDiv.textContent = jsonString; jsonDisplayArea.style.display = 'block'; downloadJSONButton.style.display = 'inline-block'; } catch (error) { console.error("Error generating Part 1 JSON:", error); alert(`Part 1 JSON Error: ${error.message}`); jsonDisplayArea.style.display = 'none'; } finally { hideLoadingOverlay(); } }, 50); });
-             generatePart2JSONButton.addEventListener('click', function() { /* ... as before ... */ showLoadingOverlay(); setTimeout(() => { try { const references = entryModule.generatePart2Json(); if (references === null) throw new Error("Part 2 failed."); const finalReferences = { References: references }; const jsonString = JSON.stringify(finalReferences, null, 2); jsonOutputTextarea.value = jsonString; jsonDisplayDiv.textContent = jsonString; jsonDisplayArea.style.display = 'block'; downloadJSONButton.style.display = 'inline-block'; } catch (error) { console.error("Error generating Part 2 JSON:", error); alert(`Part 2 JSON Error: ${error.message}`); jsonDisplayArea.style.display = 'none'; } finally { hideLoadingOverlay(); } }, 50); });
-             generateCombinedJSONButton.addEventListener('click', function() { /* ... as before ... */ showLoadingOverlay(); setTimeout(() => { try { const codeSet = entryModule.generatePart1Json(); const references = entryModule.generatePart2Json(); if (!codeSet || references === null) throw new Error("Combined generation failed."); const combinedData = { CodeSets: [codeSet], References: references }; const jsonString = JSON.stringify(combinedData, null, 2); jsonOutputTextarea.value = jsonString; jsonDisplayDiv.textContent = jsonString; jsonDisplayArea.style.display = 'block'; downloadJSONButton.style.display = 'inline-block'; } catch (error) { console.error("Error generating combined JSON:", error); alert(`Combined JSON Error: ${error.message}`); jsonDisplayArea.style.display = 'none'; } finally { hideLoadingOverlay(); } }, 50); });
-             downloadJSONButton.addEventListener('click', function() { /* ... as before ... */ const jsonString = jsonOutputTextarea.value; if (!jsonString) { alert("No JSON data generated."); return; } const now = new Date(); const timestamp = now.toISOString().replace(/[:T\-.]/g, '').substring(0,15); const filenameBase = (studyTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').substring(0,30) || 'eppimapper_data'); const filename = `${filenameBase}_${timestamp}.json`; const blob = new Blob([jsonString], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); });
+             if (addDynamicColumnButton) { // Ensure ID matches HTML button: id="addDynamicColumnBtn"
+                 addDynamicColumnButton.addEventListener('click', function() {
+                     console.log("Add Codable Column button click listener fired!"); // DEBUG
+                     if (!entryModule || typeof entryModule.addDynamicColumnRow !== 'function') {
+                          console.error("Cannot add column row: Module or function not found.");
+                          displayError("Internal error: Cannot add column row.", "Add Column Button");
+                          return;
+                      }
+                     try { entryModule.addDynamicColumnRow(); console.log("addDynamicColumnRow called successfully from listener."); // DEBUG
+                     } catch (error) { console.error("Error calling addDynamicColumnRow:", error); displayError("Error occurred while adding column row.", "Add Column Button Click", 0, error); }
+                 });
+             } else { console.error("#addDynamicColumnBtn not found!"); }
+
+             if (enterDataButtonInline) enterDataButtonInline.addEventListener('click', handleCreateTableClick); else console.error("#enterDataBtnInline not found");
+             if (clearTableButtonInline) clearTableButtonInline.addEventListener('click', handleClearTableClick); else console.error("#clearTableBtnInline not found");
+             if (pasteDataButtonInline) pasteDataButtonInline.addEventListener('click', handlePasteDataClick); else console.error("#pasteDataBtnInline not found");
+             if (generatePart1JSONButton) generatePart1JSONButton.addEventListener('click', () => generateAndDisplayJson(['part1'])); else console.error("#generatePart1JSON button not found");
+             if (generatePart2JSONButton) generatePart2JSONButton.addEventListener('click', () => generateAndDisplayJson(['part2'])); else console.error("#generatePart2JSON button not found");
+             if (generateCombinedJSONButton) generateCombinedJSONButton.addEventListener('click', () => generateAndDisplayJson(['part1', 'part2'])); else console.error("#generateCombinedJSON button not found");
+             if (downloadJSONButton) downloadJSONButton.addEventListener('click', downloadJsonFile); else console.error("#downloadJSON button not found");
+             if (saveDataBtn) saveDataBtn.addEventListener('click', saveDataToLocalStorage); else console.error("#saveDataBtn not found");
+             if (loadDataBtn) loadDataBtn.addEventListener('click', loadDataFromLocalStorage); else console.error("#loadDataBtn not found");
+             if (clearSavedDataBtn) clearSavedDataBtn.addEventListener('click', clearSavedData); else console.error("#clearSavedDataBtn not found");
+             if (closeMessageBtn) closeMessageBtn.addEventListener('click', () => { if(messageWindow) messageWindow.style.display = 'none'; }); else console.error("#closeMessageBtn not found");
+             if (addDataRowButton) addDataRowButton.addEventListener('click', handleAddDataRowClick); else console.error("#addDataRowBtn not found"); // Listener for Add Data Row button
+             if(exportStateBtn) exportStateBtn.addEventListener('click', exportStateToFile); else console.error("#exportStateBtn not found");
+             if(importFileElement) importFileElement.addEventListener('change', importStateFromFile); else console.error("#importFile element not found");
+
+            // ***** Event Delegation for Add/Remove Option Buttons & Delete Column *****
+             function handleDefinitionTableClick(event) { const target = event.target; if (target.tagName === 'BUTTON' && target.classList.contains('add-option-button')) { const button = target; const optionsContainer = button.closest('.dropdown-options-container, .checkbox-options-container, .dropdown-level2-options'); if (!optionsContainer) { console.error("Could not find parent options container."); return; } const isLevel2Add = optionsContainer.classList.contains('dropdown-level2-options'); const parentColIdentifier = optionsContainer.getAttribute('data-col-identifier') || optionsContainer.getAttribute('data-parent-col-identifier'); const parentRow = optionsContainer.closest('tr'); const hiddenL2Check = parentRow ? parentRow.querySelector(`input[type="checkbox"][id*="-l2-hidden-${parentColIdentifier}"]`) : null; if (!parentColIdentifier) { console.error("Could not find colIdentifier."); return; } try { let newOptionDiv; if (optionsContainer.classList.contains('dropdown-options-container')) newOptionDiv = entryModule.createDropdownOption(optionsContainer, parentColIdentifier, hiddenL2Check || {checked: false}, false); else if (optionsContainer.classList.contains('checkbox-options-container')) newOptionDiv = entryModule.createCheckboxOption(optionsContainer, parentColIdentifier); else if (isLevel2Add) newOptionDiv = entryModule.createDropdownOption(optionsContainer, parentColIdentifier, null, true); if (newOptionDiv && button) { optionsContainer.insertBefore(newOptionDiv, button); updateDiagramDisplay(); } else if (newOptionDiv) { optionsContainer.appendChild(newOptionDiv); console.warn("Appended option div (button ref lost)."); updateDiagramDisplay(); } } catch (e) { console.error("Error in delegated Add Option click:", e); displayError(e.message, "Delegated Add Option Click", 0, e); } } else if (target.tagName === 'BUTTON' && target.classList.contains('remove-option-button')) { try { entryModule.handleRemoveOption(event); } catch (e) { console.error("Error in delegated Remove Option click:", e); displayError(e.message, "Delegated Remove Option Click", 0, e); } } /* Delete column handled by direct onclick */ }
+            if (predefinedColumnsTableBody) predefinedColumnsTableBody.addEventListener('click', handleDefinitionTableClick); else console.error("Cannot add delegated listener: predefinedColumnsTableBody not found.");
+            if (columnDefinitionTableBody) columnDefinitionTableBody.addEventListener('click', handleDefinitionTableClick); else console.error("Cannot add delegated listener: columnDefinitionTableBody not found.");
+            // ***** END Event Delegation Setup *****
+
+            // --- Initial Setup ---
+            resetIdCounters();
+            populatePredefinedColumnsTable(); // Call this to setup the predefined UI
+            loadDataFromLocalStorage(); // Attempt load AFTER initial setup
+
+            console.log("Initial script execution finished. Ready.");
 
         }); // End DOMContentLoaded
     </script>
 </body>
-
 </html>
+// END OF CHUNK 8
+
