@@ -35,7 +35,11 @@ require([
     container: "viewDiv",
     map: webmap,
     center: [0, 10],
-    zoom: 3
+    zoom: 3,
+      constraints: {
+    maxScale: 12000000,  // Do not allow zooming in beyond 1:12M
+    minScale: 200000000  // Optional: prevent zooming too far out
+  }
   });
 
   view.popup.autoOpenEnabled = false;
