@@ -1,197 +1,278 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* General Body and Font Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f0f0f0;
+    overflow: hidden;
 }
 
-html, body {
-  height: 100%;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+.page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
+/* Header Styles */
 .un-header {
-  background-color: white;
-  border-bottom: 2px solid #0072c6;
-  padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 48px;
+    background-color: #fff;
+    border-top: 4px solid #009edb; 
+    border-bottom: 1px solid #ccc;
+    flex-shrink: 0;
+}
+.header-content { display: flex; align-items: center; gap: 16px; }
+.un-logo { height: 40px; }
+.site-branding { display: flex; flex-direction: column; line-height: 1.3; }
+.site-name a { color: #333; text-decoration: none; font-size: 16px; font-weight: bold; }
+.site-slogan { font-size: 14px; color: #6c757d; }
+.header-nav { display: flex; align-items: center; gap: 24px; }
+.header-nav a { color: #444; text-decoration: none; font-size: 14px; font-weight: 500; }
+.header-nav a:hover { text-decoration: underline; }
+/* --- Header Dropdown Menu --- */
+.dropdown-menu {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    right: 0;
+    background-color: #ffffff;
+    min-width: 240px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 20;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+/* Show the dropdown menu on hover */
+.dropdown-menu:hover .dropdown-content {
+    display: block;
 }
 
-.un-header-flex {
-  display: flex;
-  align-items: center;
+/* Main Content Section */
+.content-section {
+    padding: 16px 48px 0 48px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
-.un-logo-full {
-  height: 55px;
-  margin-right: 15px;
+.main-content-title {
+    color: #333;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    position: relative;
+    flex-shrink: 0;
+}
+.main-content-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 70px;
+    height: 4px;
+    background-color: #009edb;
 }
 
-.un-header-text {
-  display: flex;
-  flex-direction: column;
+.columns-wrapper {
+    display: flex;
+    gap: 32px;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
-.un-office {
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
+/* Left Column (Map) */
+.map-column {
+    flex: 7; /* 70% width */
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    min-width: 0;
 }
-
-.un-subtitle {
-  font-size: 14px;
-  color: #555;
+.map-wrapper {
+    position: relative;
+    flex-grow: 1;
 }
-
-.map-title-section {
-  padding: 10px 20px;
-  background-color: #f9f9f9;
-  font-size: 18px;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-}
-
-.main-layout {
-  display: flex;
-  flex: 1;
- height: calc(100vh - 100px); /* adjust based on header + title height */
-  overflow: hidden;
-}
-
-.map-container {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
 #viewDiv {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+    width: 100%;
+    height: 100%;
 }
 
-.legend-box {
-  position: absolute;
-  bottom: 00px;
-  left: 00px;
-  background: white;
-  border: 0px solid #ccc;
-  padding: 8px 12px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-  font-size: 13px;
-  z-index: 10;
-margin-bottom: 0; /* add this if missing */
+/* Right Column (Description) */
+.description-column {
+    flex: 3;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-y: scroll;
+    position: relative;  /* Required! */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.description-column {
+    padding-top: 0 !important;
+}
+.description-column > :first-child {
+    margin-top: 0 !important;
+}
+.description-column::-webkit-scrollbar {
+    display: none;
+}
+.scroll-indicator {
+    position: fixed;
+    bottom: 12px;
+    right: 18px;
+    font-size: 26px;
+    color: #bbb;
+    pointer-events: none;
+    z-index: 10;
+    background: transparent;
 }
 
-.legend-box h4 {
-  margin-bottom: 6px;
-  font-size: 13px;
+
+
+/* Disclaimer Text Styling */
+/* UPDATED: Disclaimer Text Styling */
+.disclaimer-text {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 42px; /* Increase for comfort */
+    padding: 0 16px;
+    background-color: #f1f3f4; /* Stronger contrast */
+    border-top: 1px solid #dee2e6;
+    flex-shrink: 0;
 }
 
-.legend-gradient {
-  height: 12px;
-  width: 100px;
-  background: linear-gradient(to right, #e0f3f8, #08589e);
-  margin-bottom: 4px;
+.disclaimer-content {
+    flex-grow: 1;
+    height: 18px; /* Give text room */
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.legend-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
+.disclaimer-content::-webkit-scrollbar {
+    display: none;
 }
 
-.description-box {
-  width: 480px;
-  height: 100%;
-  background-color: #f4f9fc;
-  padding: 20px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #222;
-
-
+.disclaimer-content p {
+    font-size: 13px;
+    color: #495057;   /* Much darker */
+    line-height: 1.4;
+    margin: 0;
 }
 
-.description-box p {
-  text-align: justify;
+.disclaimer-scroll-buttons button {
+    border: none;
+    background: none;
+    color: #888;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 10px;
 }
 
-.description-box h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
+.disclaimer-scroll-buttons button:hover {
+    color: #000;
 }
 
-.description-box a {
-  color: #0072c6;
-  text-decoration: none;
+.disclaimer-text p { margin: 0; }
+
+
+.fullscreen-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1001;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 8px;
+    font-size: 24px;
+    color: #444;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 0 1.5px 4px rgba(0,0,0,0.12);
+    transition: background 0.18s, box-shadow 0.18s;
+}
+.fullscreen-btn:hover {
+    background: #f6f6f6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.description-box a:hover {
-  text-decoration: underline;
+.fullscreen-map {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+.fullscreen-map .main-content-title {
+    width: 100%;
+    margin: 0 !important;
+    padding: 24px 32px 10px 32px;
+    background: #fff;
+    z-index: 1;
+}
+.fullscreen-map .columns-wrapper,
+.fullscreen-map .map-column,
+.fullscreen-map .map-wrapper {
+    flex: 1 1 100%;
+    width: 100vw !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+.fullscreen-map .description-column {
+    display: none !important;
 }
 
-.disclaimer-footer {
-  padding: 10px 20px;
-  font-size: 11px;
-  background-color: #f9f9f9;
-  color: #555;
-  border-top: 1px solid #ddd;
-  text-align: center;
-  max-width: calc(100% - 500px); /* keep right aligned under map */
-  margin-left: 20px;
-}
+/* Map Overlays */
+.map-legend { position: absolute; bottom: 8px; left: 8px; background-color: rgba(255, 255, 255, 0.95); padding: 6px 8px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); z-index: 10; width: 110px; border: 1px solid #eee; }
+.map-legend h4 { margin: 0 0 6px 0; font-size: 12px; font-weight: normal; color: #333; }
+.legend-gradient { height: 12px; width: 100%; background: linear-gradient(to right, #e0f3f8, #08589e); border: 1px solid #ccc; }
+.legend-labels { display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; color: #333; }
+.map-credit-container { position: absolute; bottom: 16px; right: 0px; font-size: 12px; color: #009edb; display: flex; gap: 16px; z-index: 10; background-color: rgba(255, 255, 255, 0.8); padding: 4px 8px; border-radius: 3px; }
 
-.esri-ui-top-right {
-  top: 90px !important;
-  right: 20px !important;
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+    body, html { height: auto; overflow: auto; }
+    .page-container, .columns-wrapper { height: auto; overflow: visible; }
+    .columns-wrapper { flex-direction: column; }
+    .un-header, .content-section { padding-left: 32px; padding-right: 32px; }
+    .map-wrapper { min-height: 450px; }
+    .description-column { padding-top: 16px; overflow-y: visible; }
 }
-.map-title-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #f9f9f9;
-  font-size: 18px;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-  flex-wrap: wrap;
+@media (max-width: 768px) {
+    .un-header, .content-section { padding: 16px 24px; }
+    .un-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .map-wrapper { min-height: 350px; }
 }
-
-.map-title-left {
-  color: #333;
-}
-
-.map-title-buttons {
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.map-button {
-  background-color: #0072c6;
-  color: #fff;
-  padding: 6px 12px;
-  font-size: 13px;
-  text-decoration: none;
-  border-radius: 3px;
-  transition: background-color 0.3s ease;
-}
-
-.map-button:hover {
-  background-color: #005fa3;
-}
-
-.legend-credit {
-  margin-left: 20px;
-  margin-top: 0px;
-  font-size: 12px;
-  color: #666;
-}
-

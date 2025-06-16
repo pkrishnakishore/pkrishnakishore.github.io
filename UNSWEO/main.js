@@ -1,11 +1,7 @@
 require([
   "esri/views/MapView",
-  "esri/WebMap",
-  "esri/layers/GraphicsLayer",
-  "esri/Graphic",
-  "esri/geometry/geometryEngine",
-  "esri/geometry/projection"
-], function(MapView, WebMap, GraphicsLayer, Graphic, geometryEngine, projection) {
+  "esri/WebMap"
+], function(MapView, WebMap) {
 
   let logCounter = 1;
   function logToMessageBox(message) {
@@ -27,99 +23,100 @@ require([
 
   const webmap = new WebMap({
     portalItem: {
-      id: "f63d18b1d66e463bba1a2194c19467cc"
+      id: "6352a17864b347168ef950421f6c8b8c"
     }
   });
 
   const view = new MapView({
     container: "viewDiv",
     map: webmap,
-    center: [0, 10],
-    zoom: 3,
-  constraints: {
-    maxScale: 12000000,  // Do not allow zooming in beyond 1:12M
-    minScale: 200000000  // Optional: prevent zooming too far out
-  }  });
+scale: 200000000,
+    constraints: {
+      maxScale: 12000000,
+      minScale: 200000000
+    }
+  });
 
+  // --- Popup Configuration ---
   view.popup.autoOpenEnabled = false;
-
-  const highlightGraphicsLayer = new GraphicsLayer({ title: "Highlight Layer" });
-  webmap.add(highlightGraphicsLayer);
-
-  let halaibProjectedGeometries = [];
+  view.popup.highlightEnabled = false;
 
   view.when(() => {
     logToMessageBox("Map and view are ready.");
+// Logic for Disclaimer Scroll Buttons
+const disclaimerContent = document.getElementById('disclaimerContent');
+const disclaimerScrollUpBtn = document.getElementById('disclaimerScrollUp');
+const disclaimerScrollDownBtn = document.getElementById('disclaimerScrollDown');
 
+if(disclaimerContent && disclaimerScrollUpBtn && disclaimerScrollDownBtn) {
+    const scrollAmount = 12; // Scroll by one line (10px font size + 2px buffer)
+
+    disclaimerScrollUpBtn.addEventListener('click', function() {
+        disclaimerContent.scrollTop -= scrollAmount;
+    });
+
+    disclaimerScrollDownBtn.addEventListener('click', function() {
+        disclaimerContent.scrollTop += scrollAmount;
+    });
+}
+
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+const contentSection = document.querySelector('.content-section');
+
+if (fullscreenBtn && contentSection) {
+    fullscreenBtn.addEventListener('click', function() {
+        contentSection.classList.toggle('fullscreen-map');
+        // Change button icon and title
+        if (contentSection.classList.contains('fullscreen-map')) {
+            fullscreenBtn.textContent = '✖'; // Exit icon
+            fullscreenBtn.title = "Exit full screen";
+        } else {
+            fullscreenBtn.textContent = '⛶';
+            fullscreenBtn.title = "Expand to full screen";
+        }
+        // Helps ArcGIS map resize correctly
+        setTimeout(function() {
+            view.resize();
+        }, 350);
+    });
+}
     webmap.when(() => {
       const halaibLayer = webmap.allLayers.find(layer => layer.title === "Halaib");
-
-      if (!halaibLayer) {
+      if (halaibLayer) {
+        halaibLayer.visible = true;
+        halaibLayer.definitionExpression = "STSCOD = 99";
+      } else {
         logToMessageBox("WARNING: 'Halaib' layer NOT FOUND.");
-        return;
       }
-
-      halaibLayer.visible = true;
-      halaibLayer.definitionExpression = "STSCOD = 99"; // Filter visually too
-
-      halaibLayer.when(() => {
-        halaibLayer.queryFeatures({
-          where: "STSCOD = 99", // Actual filter
-          returnGeometry: true,
-          outFields: ["*"]
-        }).then(response => {
-          if (response.features.length > 0) {
-            projection.load().then(() => {
-              halaibProjectedGeometries = response.features.map(f =>
-                projection.project(f.geometry, view.spatialReference)
-              );
-
-              logToMessageBox(`Projected ${halaibProjectedGeometries.length} filtered Halaib polygons.`);
-
-             // halaibProjectedGeometries.forEach(geom => {
-             //   highlightGraphicsLayer.add(new Graphic({
-             //     geometry: geom,
-             //     symbol: {
-             //       type: "simple-fill",
-             //      color: [0, 255, 0, 0.3],
-             //       outline: { color: [0, 255, 0], width: 2 }
-             //     }
-             //   }));
-            //  });
-            });
-          } else {
-            logToMessageBox("No filtered features found in Halaib.");
-          }
-        }).catch(err => {
-          logToMessageBox("ERROR querying Halaib: " + err.message);
-        });
-      });
+      
+      // *** POP up configuration***
+      const targetLayerTitle = "Update evaluation reports with cote _ turkey_Popup";
 
       view.on("click", event => {
-        const point = event.mapPoint;
         logCounter = 1;
         logToMessageBox("--- New Click Event ---");
-        logToMessageBox(`Clicked at: ${point.longitude.toFixed(4)}, ${point.latitude.toFixed(4)}`);
-
-        if (
-          halaibProjectedGeometries.length &&
-          halaibProjectedGeometries.some(geom => geometryEngine.contains(geom, point))
-        ) {
-          logToMessageBox("Click is inside filtered Halaib — popup suppressed.");
-          return;
-        }
-
-        logToMessageBox("Click is outside Halaib — running hitTest.");
 
         view.hitTest(event).then((response) => {
-          const graphicResult = response.results.find(r =>
-            r.graphic?.layer?.popupTemplate
-          );
+          
+          // Find a feature that belongs to the specific target layer
+          const graphicResult = response.results.find(result => {
+            const layer = result.graphic?.layer;
+            return layer && 
+                   layer.title === targetLayerTitle && 
+                   layer.popupTemplate;
+          });
+
           if (graphicResult) {
+            // If a valid feature from the target layer was clicked, open its popup.
+            logToMessageBox(`Feature found on layer: "${targetLayerTitle}". Opening popup.`);
             view.popup.open({
               features: [graphicResult.graphic],
               location: event.mapPoint
             });
+          } else {
+            // If no feature was found, or the feature was from a different layer, do nothing.
+            logToMessageBox("Click did not hit a feature on the target layer.");
+            view.popup.close();
           }
         });
       });
