@@ -1,14 +1,14 @@
 # Krishna Kishore Pandalaneni — research portfolio
 
-**Comparative politics · Political institutions · Evidence synthesis**
+**Engineering · Public policy · Data · Evidence synthesis**
 
 [Research portfolio](https://pkrishnakishore.github.io/) · [GitHub](https://github.com/pkrishnakishore) · [Contact](mailto:kp3076@columbia.edu)
 
-My developing doctoral research asks when political consultants shift decision-making authority within parties, and how their involvement changes relations between leaders and grassroots cadres. India provides a setting for a broader comparative inquiry into political expertise, organization, and representation.
+I bring engineering, public policy, and data analysis together to study complex problems. My experience spans industrial R&D, UN evaluation, collaborative client research, and evidence synthesis. The portfolio connects technical measurement and validation with institutional context, mixed methods, and research communication.
 
 ## Start here
 
-- [Research agenda and publications](https://pkrishnakishore.github.io/#research)
+- [Research approach and publications](https://pkrishnakishore.github.io/#research)
 - [Research and professional background](https://pkrishnakishore.github.io/projects.html)
 - [Evidence-mapping template: source and guide](https://github.com/pkrishnakishore/MAPS)
 - [UN evaluation evidence maps: project guide](https://github.com/pkrishnakishore/UN-SWEO)
@@ -31,7 +31,7 @@ Institutional outputs are collaborative products. The research tools deposited h
 
 | Path | Purpose |
 | --- | --- |
-| `index.html` | Research agenda, publications, and selected work |
+| `index.html` | Interdisciplinary research approach, publications, experience, and coursework |
 | `projects.html` | Research background and preparation |
 | `style.css` | Responsive portfolio styles |
 | `EPPI_V6.html` | Browser-based evidence-coding template |
